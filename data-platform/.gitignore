@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Entorno y secretos (NUNCA versionar)
+.env
+.env.*
+!.env.example
+*.log
+logs/
+
+# Datos y artefactos generados
+data/raw/
+data/tmp/
+services/alerting/data/*.db
+*.bak
+*.tmp
+
+# Modelos entrenados (se regeneran con el pipeline)
+machine-learning/artifacts/*.pkl
+machine-learning/artifacts/*.joblib
+services/ml/artifacts/*.joblib
+services/ml/artifacts/*.pkl
+
+# Editores / sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archivos locales sueltos (no forman parte de la entrega)
+ejemplo chatbot
