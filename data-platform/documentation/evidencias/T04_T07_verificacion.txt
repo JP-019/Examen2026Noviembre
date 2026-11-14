@@ -1,0 +1,63 @@
+﻿Changed database context to 'DataPlatform'.
+=== 1. Objetos por esquema ===
+esquema tipo cantidad
+------- ---- --------
+audit USER_TABLE 3
+clean USER_TABLE 10
+dw USER_TABLE 5
+dw VIEW 1
+quarantine USER_TABLE 1
+raw USER_TABLE 10
+ready USER_TABLE 1
+
+(7 rows affected)
+=== 2. Columnas minimas de auditoria (T04) ===
+columna tipo
+------- ----
+execution_id bigint
+pipeline_name varchar
+start_time datetime2
+end_time datetime2
+source_object varchar
+target_object varchar
+rows_read int
+rows_inserted int
+rows_updated int
+rows_rejected int
+status varchar
+error_detail nvarchar
+watermark_start datetime2
+watermark_end datetime2
+
+(14 rows affected)
+=== 3. Miembros desconocidos (clave 0) ===
+dimension miembros_0
+--------- ----------
+DimTiempo 1
+DimProducto 1
+DimLocal 1
+DimVersion 1
+
+(4 rows affected)
+=== 4. Cobertura de DimTiempo ===
+desde hasta dias
+----- ----- ----
+2000-01-01 2035-12-31 13149
+
+(1 rows affected)
+=== 5. Huerfanos en el hecho (debe devolver 0 filas) ===
+hechos_huerfanos
+----------------
+0
+
+(1 rows affected)
+=== 6. Consulta de validacion sobre la vista de consumo ===
+NumeroFactura Fecha NombreProducto NombreLocal Cantidad PrecioUnitario ImporteLinea
+------------- ----- -------------- ----------- -------- -------------- ------------
+
+(0 rows affected)
+=== 7. Estado de la ultima ejecucion ETL registrada ===
+execution_id pipeline_name source_object target_object rows_read rows_inserted rows_rejected status start_time end_time
+------------ ------------- ------------- ------------- --------- ------------- ------------- ------ ---------- --------
+
+(0 rows affected)
