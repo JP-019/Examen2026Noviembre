@@ -4,6 +4,7 @@ Indice de la documentacion tecnica. Cada documento declara su tarea de origen.
 
 | Archivo | Contenido | Tarea |
 |---|---|---|
+| `informe_final.md` | Informe de cierre: sprints, estado T01-T15, evidencias y trazabilidad | T14, T15 |
 | `requerimientos.md` | Requerimientos funcionales, no funcionales y no-alcance | T14 |
 | `arquitectura.md` | Alcance, capas, diagrama, stack, frecuencia y riesgos | T03 |
 | `adr/` | 7 decisiones de arquitectura justificadas | T03 |
@@ -26,15 +27,16 @@ Indice de la documentacion tecnica. Cada documento declara su tarea de origen.
 
 ## Orden de lectura recomendado
 
-1. `requerimientos.md` para saber que se prometio.
-2. `arquitectura.md` para entender el sistema.
-3. `adr/` para entender por que se eligio cada tecnologia.
-4. `fuente_datos.md`, `staging.md` y `modelo_dimensional.md` para el diseno de datos.
-5. `calidad_datos.md` y `etl.md` para las reglas y el pipeline.
-6. `api_contratos.md`, `ml.md`, `genai.md` y `alertas.md` para los servicios.
-7. `manual.md` para instalarlo y operarlo.
-8. `plan_pruebas.md` y `evidencias/` para comprobar que funciona.
-9. `demo.md` para presentarlo.
+1. `informe_final.md` para el estado de cierre y la trazabilidad con la rubrica.
+2. `requerimientos.md` para saber que se prometio.
+3. `arquitectura.md` para entender el sistema.
+4. `adr/` para entender por que se eligio cada tecnologia.
+5. `fuente_datos.md`, `staging.md` y `modelo_dimensional.md` para el diseno de datos.
+6. `calidad_datos.md` y `etl.md` para las reglas y el pipeline.
+7. `api_contratos.md`, `ml.md`, `genai.md` y `alertas.md` para los servicios.
+8. `manual.md` para instalarlo y operarlo.
+9. `plan_pruebas.md` y `evidencias/` para comprobar que funciona.
+10. `demo.md` para presentarlo.
 
 ## Evidencias
 
