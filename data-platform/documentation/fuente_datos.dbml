@@ -1,0 +1,73 @@
+// Diagrama editable de la fuente `Venta` (dbdiagram.io)
+// Pegar el contenido en https://dbdiagram.io
+
+Table Factura {
+  idFactura int [pk]
+  VentaAsociada decimal
+  fecha datetime
+  numeroFactura int [note: 'en la fuente: nºFactura']
+  IdLocal int [ref: > Local.IdLocal]
+  IdVersion int [ref: > Version.IdVersion]
+}
+
+Table Factura_Detalle {
+  Id_Factura_Detalle int [pk]
+  IdProducto int [ref: > Producto.idProducto]
+  IdFactura int [ref: > Factura.idFactura]
+  PrecioSinImporte decimal
+  Cantidad int
+}
+
+Table Producto {
+  idProducto int [pk]
+  NombreProducto varchar
+  idSubFamilia int [ref: > SubFamilia.idSubFamilia]
+}
+
+Table SubFamilia {
+  idSubFamilia int [pk]
+  NombreSubFamilia varchar
+  idFamilia int [ref: > Familia.idFamilia]
+}
+
+Table Familia {
+  idFamilia int [pk]
+  NombreFamilia varchar
+  idCategoria int [ref: > Categoria.idCategoria]
+}
+
+Table Categoria {
+  idCategoria int [pk]
+  NombreCategoria varchar
+  idRubro int [ref: > Rubro.idRubro]
+}
+
+Table Rubro {
+  idRubro int [pk]
+  NombreRubro varchar
+  idSeccion int [ref: > Seccion.idSeccion]
+}
+
+Table Seccion {
+  idSeccion int [pk]
+  NombreSeccion varchar
+}
+
+Table Local {
+  IdLocal int [pk]
+  Nombre varchar
+}
+
+Table Version {
+  IdVersion int [pk]
+  Nombre varchar
+}
+
+Table ProcesoCargaIncremental {
+  IdProceso int [pk]
+  IdTipoProceso int
+  IdLocal int
+  Fecha datetime
+  Cargar char
+  Cargadoencubo char
+}

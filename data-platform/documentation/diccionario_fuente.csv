@@ -1,0 +1,39 @@
+tabla,columna,tipo,nullable,pk,fk,descripcion
+Factura,idFactura,int,NO,SI,,PK de la cabecera de factura
+Factura,VentaAsociada,decimal,NO,,,Importe declarado en cabecera; no cuadra con el detalle y no se usa como medida
+Factura,fecha,datetime,NO,,,Fecha de la venta
+Factura,numeroFactura,int,NO,,,Numero visible de factura; en la fuente se llama nºFactura
+Factura,IdLocal,int,SI,,SI,Local de la venta
+Factura,IdVersion,int,SI,,SI,Version del sistema que registro la venta
+Factura_Detalle,Id_Factura_Detalle,int,NO,SI,,PK de la linea de factura
+Factura_Detalle,IdProducto,int,NO,,SI,Producto vendido
+Factura_Detalle,IdFactura,int,NO,,SI,Cabecera de la factura
+Factura_Detalle,PrecioSinImporte,decimal,NO,,,Precio unitario de la linea
+Factura_Detalle,Cantidad,int,NO,,,Unidades vendidas
+Producto,idProducto,int,NO,SI,,PK del producto
+Producto,NombreProducto,varchar(30),NO,,,Nombre del producto (puede traer espacio final)
+Producto,idSubFamilia,int,NO,,SI,Subfamilia del producto
+SubFamilia,idSubFamilia,int,NO,SI,,PK de la subfamilia
+SubFamilia,NombreSubFamilia,varchar(30),NO,,,Nombre de la subfamilia
+SubFamilia,idFamilia,int,NO,,SI,Familia a la que pertenece
+Familia,idFamilia,int,NO,SI,,PK de la familia
+Familia,NombreFamilia,varchar(30),NO,,,Nombre de la familia
+Familia,idCategoria,int,NO,,SI,Categoria a la que pertenece
+Categoria,idCategoria,int,NO,SI,,PK de la categoria
+Categoria,NombreCategoria,varchar(30),NO,,,Nombre de la categoria
+Categoria,idRubro,int,NO,,SI,Rubro al que pertenece
+Rubro,idRubro,int,NO,SI,,PK del rubro
+Rubro,NombreRubro,varchar(30),NO,,,Nombre del rubro
+Rubro,idSeccion,int,NO,,SI,Seccion a la que pertenece
+Seccion,idSeccion,int,NO,SI,,PK de la seccion
+Seccion,NombreSeccion,varchar(30),NO,,,Nombre de la seccion
+Local,IdLocal,int,NO,SI,,PK del local
+Local,Nombre,varchar(50),SI,,,Nombre del punto de venta
+Version,IdVersion,int,NO,SI,,PK de la version del sistema
+Version,Nombre,varchar(50),SI,,,Nombre de la version (REAL o PRESUPUESTO)
+ProcesoCargaIncremental,IdProceso,int,NO,SI,,PK de la marca de carga
+ProcesoCargaIncremental,IdTipoProceso,int,SI,,,Tipo de proceso del sistema de origen
+ProcesoCargaIncremental,IdLocal,int,SI,,,Local asociado a la marca
+ProcesoCargaIncremental,Fecha,datetime,SI,,,Fecha de la marca de carga
+ProcesoCargaIncremental,Cargar,char(1),SI,,,Indicador de carga pendiente del origen
+ProcesoCargaIncremental,Cargadoencubo,char(1),SI,,,Indicador de carga al cubo del origen
