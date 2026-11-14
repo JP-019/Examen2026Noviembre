@@ -1,0 +1,62 @@
+// Modelo dimensional - Ventas
+// Pegar en https://dbdiagram.io para editar visualmente.
+// T07 - Data Warehouse
+
+Table dw.DimTiempo {
+  TiempoKey int [pk, note: 'AAAAMMDD, 0 = desconocido']
+  Fecha date [not null, unique]
+  Anio int [not null]
+  Trimestre int [not null]
+  Mes int [not null]
+  NombreMes varchar(20) [not null]
+  SemanaISO int [not null]
+  Dia int [not null]
+  NombreDia varchar(20) [not null]
+  AnioMes int [not null]
+  EsFinDeSemana bit [not null]
+}
+
+Table dw.DimProducto {
+  ProductoKey int [pk, increment]
+  ProductoNaturalKey int [not null, unique]
+  NombreProducto varchar(100) [not null]
+  SubFamilia varchar(100)
+  Familia varchar(100)
+  Categoria varchar(100)
+  Rubro varchar(100)
+  Seccion varchar(100)
+  JerarquiaCompleta varchar(500)
+  EsVigente bit [not null]
+  FilaDesde datetime2 [not null]
+  FilaHasta datetime2
+  EsDesconocido bit [not null, default: 0]
+}
+
+Table dw.DimLocal {
+  LocalKey int [pk, increment]
+  LocalNaturalKey int [not null, unique]
+  NombreLocal varchar(100)
+  EsDesconocido bit [not null, default: 0]
+}
+
+Table dw.DimVersion {
+  VersionKey int [pk, increment]
+  VersionNaturalKey int [not null, unique]
+  NombreVersion varchar(100)
+  EsDesconocido bit [not null, default: 0]
+}
+
+Table dw.FactVentas {
+  VentaKey bigint [pk, increment]
+  TiempoKey int [not null, ref: > dw.DimTiempo.TiempoKey]
+  ProductoKey int [not null, ref: > dw.DimProducto.ProductoKey]
+  LocalKey int [not null, ref: > dw.DimLocal.LocalKey]
+  VersionKey int [not null, ref: > dw.DimVersion.VersionKey]
+  NumeroFactura int [not null, note: 'dimension degenerada']
+  Cantidad int [not null]
+  PrecioUnitario decimal(18,2) [not null]
+  Descuento decimal(18,2) [not null, default: 0]
+  ImporteLinea decimal(18,2) [not null]
+  FechaCarga datetime2 [not null]
+  ExecutionId bigint [not null]
+}
