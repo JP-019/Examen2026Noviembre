@@ -30,6 +30,8 @@ Examen2026Noviembre/
 | `manual_usuario.docx` | La misma guia en Word con formato APA 7 |
 | `informe.md` | Informe final: objetivos, arquitectura, resultados y trazabilidad |
 | `informe.docx` | El mismo informe en Word con formato APA 7 |
+| `guion_video.md` | Guion cronometrado de la demo de 5 minutos y comandos de ejecucion |
+| `guion_video.docx` | El mismo guion en Word, listo para imprimir |
 
 ### `data-platform/`
 

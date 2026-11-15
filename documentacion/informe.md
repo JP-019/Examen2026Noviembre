@@ -29,6 +29,24 @@ se obtuvieron y qué queda pendiente. Todas las cifras provienen de ejecuciones
 reales registradas en la carpeta de evidencias del repositorio; no se reportan
 resultados no medidos.
 
+El punto de partida fue una base transaccional heredada, con nombres de columnas
+inconsistentes, una sola ventana de datos y sin una capa intermedia que separara
+la operación diaria del análisis. En ese contexto, el problema no era solo
+consultar cifras, sino garantizar que las cifras consultadas fueran las mismas que
+las de la fuente y que cualquier diferencia pudiera explicarse. Por eso el
+proyecto se diseñó alrededor de la trazabilidad: cada fila conserva su clave de
+negocio y el identificador de la ejecución que la produjo, y cada total se
+reconcilia entre capas antes de publicarse.
+
+El documento se organiza en nueve secciones. Las dos primeras describen el marco
+de trabajo y la arquitectura; la tercera explica cómo se gobernaron los datos; la
+cuarta recorre los servicios analíticos; la quinta documenta el bot de Telegram
+como proyecto independiente; la sexta presenta las pruebas y los resultados; la
+séptima relaciona el trabajo con la rúbrica; la octava enumera los riesgos; y la
+novena declara, sin matices, los requisitos que no se cumplieron. Se incluyen
+además cuatro anexos con la estructura del repositorio, el estado de las tareas,
+los comandos de verificación y el control de secretos.
+
 ---
 
 ## Objetivos
@@ -39,6 +57,12 @@ Diseñar e implementar una plataforma de datos reproducible que permita analizar
 las ventas con indicadores confiables, predicciones honestas, consultas en
 lenguaje natural y avisos automáticos, sin que ningún consumidor acceda
 directamente a la base transaccional.
+
+El objetivo general se entiende cumplido cuando una persona distinta de quien
+construyó el sistema puede seguir las instrucciones del repositorio, ejecutar el
+pipeline, abrir el panel y obtener los mismos totales que la fuente. Esa
+condición de reproducibilidad es la que guía las decisiones de arquitectura y la
+que explica por qué el proyecto invierte tanto en auditoría y reconciliación.
 
 ### Objetivos específicos
 
@@ -64,6 +88,22 @@ directamente a la base transaccional.
 
 Se aplicó Scrum con sprints comprimidos y un buffer final. La tabla 1 resume los
 roles y las tareas asignadas.
+
+La compresión del calendario obligó a tomar dos decisiones de método. La primera
+fue asignar un responsable único por tarea, con un rol de apoyo para revisión, de
+modo que ninguna actividad quedara sin dueño. La segunda fue fijar la evidencia
+como criterio de cierre: una tarea no se consideraba terminada por haber escrito
+código, sino por haber dejado un archivo reproducible en la carpeta de evidencias.
+Esa regla evitó discusiones sobre el estado del trabajo y permitió que la revisión
+de sprint se hiciera sobre resultados concretos.
+
+Los roles se mantuvieron separados aunque el equipo fuera pequeño, porque la
+separación obliga a explicar las decisiones. El Product Owner defendió el alcance
+y la prioridad; el Scrum Master protegió el tiempo y desbloqueó dependencias; los
+roles técnicos se repartieron por dominio de datos, analítica y automatización; y
+el rol de calidad concentró la documentación y las pruebas. En la práctica, una
+misma persona cubrió más de un rol, pero la responsabilidad quedó declarada para
+cada entregable.
 
 Tabla 1
 
@@ -96,6 +136,23 @@ Se realizaron las ceremonias previstas: planificación al inicio de cada sprint,
 reunión diaria, revisión con evidencia y retrospectiva. La regla de recorte no
 fue necesaria, salvo en las dos tareas que se explican en la sección 8.
 
+El sprint S0 se dedicó a reducir la incertidumbre: verificar la conexión con SQL
+Server, inventariar las tablas, dibujar el modelo entidad-relación y registrar las
+decisiones de arquitectura antes de escribir el ETL. Esa inversión inicial evitó
+retrabajo, porque las reglas de calidad y el grano del hecho se definieron sobre
+el modelo y no sobre el código. El sprint S1 convirtió ese diseño en un pipeline
+ejecutable con tres zonas, auditoría y cuarentena. El sprint S2 agregó la capa de
+consumo y la automatización. El sprint S3 se reservó para pruebas, documentación y
+demo, con un buffer que absorbió las tareas que no dependían solo del equipo.
+
+La revisión de cada sprint se hizo contra la carpeta de evidencias y no contra
+diapositivas. En S0 se revisaron el inventario y los ADR; en S1, los conteos de
+cada capa y la reconciliación; en S2, las capturas de la API, el panel, el modelo,
+el asistente y los avisos; y en S3, el plan de pruebas y los documentos finales.
+La retrospectiva se centró en dos preguntas: qué evidencia faltó y qué decisión
+habría que revertir si el alcance cambiara. Ambas preguntas alimentaron la sección
+de riesgos y la lista de pendientes.
+
 ---
 
 ## 2. Arquitectura de la solución
@@ -113,6 +170,20 @@ La solución se organiza en capas con responsabilidades separadas:
 
 La regla de oro del proyecto es que **solo la API y el ETL hablan con SQL
 Server**. El panel y el asistente consumen HTTP.
+
+Esa separación tiene una consecuencia práctica: cualquier consumidor nuevo, sea
+un cuaderno de análisis o una aplicación móvil, se conecta a la API y hereda los
+mismos filtros, los mismos límites y las mismas validaciones. También permite
+razonar sobre el rendimiento por separado, porque la base atiende un número
+acotado de consultas y no la suma de todos los clientes.
+
+El recorrido de una fila ilustra el diseño. La fila nace en la tabla de detalle de
+factura, se copia sin transformación a `raw`, se tipa y valida en `clean`, se
+integra con sus dimensiones en `ready` y se inserta en `dw.FactVentas` con las
+claves sustitutas. En cada salto se registra el identificador de ejecución, de
+modo que un total se puede descomponer hasta la fila original. Si una fila no
+supera una validación, no desaparece: se copia a cuarentena con el código de la
+regla que la rechazó.
 
 ### 2.2 Stack tecnológico
 
@@ -132,6 +203,21 @@ Tabla 3
 | Bot de ejemplo | Node.js, Express y API de Telegram |
 | Versionado | Git |
 
+La elección del stack respondió a tres criterios: que las herramientas ya
+estuvieran disponibles en el equipo, que permitieran ejecutar todo en local sin
+servicios en la nube y que tuvieran documentación suficiente para justificar cada
+decisión. SQL Server se conservó porque la fuente ya vivía en esa instancia y
+migrarla habría agregado un riesgo innecesario. Python concentró el ETL, la API,
+el modelo y el asistente para reducir el número de lenguajes. Streamlit permitió
+publicar un panel sin construir un frontend completo, y Git sostuvo la
+trazabilidad de los entregables.
+
+La contrapartida fue aceptar dependencias pesadas. Streamlit y scikit-learn
+agregan librerías que una solución más liviana no requeriría, y el modelo local
+opcional suma una dependencia externa que se puede desactivar. Esa contrapartida
+se documentó en el manual de instalación para que quien reproduzca el proyecto
+sepa qué necesita y qué puede omitir.
+
 ### 2.3 Decisiones de arquitectura
 
 Tabla 4
@@ -148,6 +234,20 @@ Tabla 4
 | ADR-006 | Asistente con consultas aprobadas, sin SQL libre |
 | ADR-007 | Microservicios desplegables de forma independiente |
 
+Las decisiones se registraron como ADR porque el proyecto tenía alternativas
+razonables en casi todos los puntos. Elegir una base distinta, un modelo
+dimensional con otro grano o un asistente con SQL libre habría producido un
+sistema defendible pero con riesgos diferentes. El ADR deja constancia del
+contexto y de la consecuencia, de modo que una revisión posterior pueda discutir
+la decisión sin reconstruirla.
+
+La decisión con mayor impacto fue el grano del hecho: línea de factura. Un grano
+de cabecera habría simplificado los conteos, pero habría impedido analizar
+productos y secciones. El grano de línea conserva esa capacidad y obliga a cuidar
+la reconciliación de importes, porque una factura se reparte en varias filas. Esa
+consecuencia se verificó en la práctica: la suma de las líneas coincide en todas
+las capas con el total de la fuente de detalle.
+
 ---
 
 ## 3. Gestión y calidad de datos
@@ -163,12 +263,41 @@ La tabla de auditoría registra, por ejecución, el origen, el destino, las fila
 leídas, insertadas, actualizadas y rechazadas, además del estado y el detalle del
 error.
 
+La extracción admite dos modos. El modo `full` recorre todas las filas y se usa
+para la carga inicial o para reconstruir el ambiente. El modo `incremental` lee
+la marca de agua, aplica un solapamiento de días para no perder registros que
+llegaron tarde y vuelve a procesar ese tramo. El solapamiento es deliberado: en
+lugar de suponer que la fuente nunca cambia, el pipeline asume que puede
+haber cambios retroactivos y los absorbe sin duplicar.
+
+La zona `raw` es de solo anexar. No se actualiza ni se borra, de modo que siempre
+existe una copia fiel de lo que la fuente entregó en cada ejecución. Esa
+decisión tiene un costo de almacenamiento y un beneficio claro: si una
+transformación se equivoca, se puede volver a procesar sin pedirle nada a la
+fuente. La zona `clean` tipa los campos, normaliza nombres y aplica las reglas de
+calidad; la zona `ready` resuelve las dimensiones y deja las filas listas para el
+hecho.
+
 ### 3.2 Reglas de calidad
 
 Se catalogaron quince reglas de calidad, con identificador, condición y acción.
 Las filas que no cumplen una regla se derivan a cuarentena en lugar de
 descartarse en silencio. Las medidas nunca se imputan con cero, porque eso
 distorsionaría los indicadores.
+
+El catálogo cubre claves nulas, cantidades no positivas, precios negativos o
+fuera de rango, facturas huérfanas, productos inexistentes, fechas nulas o
+futuras, números de factura inválidos, nombres vacíos, duplicados en el lote y
+jerarquías incompletas. Cada regla tiene un código estable, de `DQ-001` a
+`DQ-015`, que se guarda junto con la fila rechazada. Así, cuando el reporte de
+calidad muestra un rechazo, se puede identificar la regla y la fila sin ambigüedad.
+
+La política de cuarentena es conservadora. Un rechazo no se corrige en el momento
+ni se reemplaza por un valor promedio: la fila se aparta y se informa. Esa
+decisión retrasa la carga, pero evita que un dato inventado se propague al Data
+Warehouse y llegue al panel como si fuera real. El comando de reporte de calidad
+reconstruye el conteo por regla, el total de rechazos y la reconciliación entre
+capas, de modo que la revisión se puede repetir en cualquier momento.
 
 ### 3.3 Modelo dimensional y reconciliación
 
@@ -190,6 +319,25 @@ Tabla 5
 Los huérfanos en la tabla de hechos son cero y no quedaron diferencias sin
 justificar.
 
+El esquema estrella se eligió por su legibilidad para el negocio. Una consulta de
+ventas por local, por producto o por mes se resuelve con un `JOIN` a una
+dimensión y una suma sobre el hecho, sin cadenas de subconsultas. Esa simplicidad
+importa porque el panel y el asistente consumen la misma estructura: si el modelo
+fuera más complejo, cada consumidor tendría que replicar la lógica y las cifras
+podrían divergir.
+
+La tabla de hechos conserva la clave natural de la línea además de las claves
+sustitutas. Esa duplicidad permite reconstruir el origen y auditar una fila sin
+depender de los identificadores internos. Cuando una dimensión no se resuelve, se
+usa el miembro desconocido con clave cero; la alternativa, descartar la fila,
+habría reducido el total y roto la reconciliación sin dejar rastro.
+
+La verificación se hizo con una consulta que suma el importe en cada capa y
+compara los resultados. La tabla 5 muestra que las cuatro capas coinciden en
+cinco filas y S/ 696.40. El número es pequeño porque la fuente de práctica tiene
+un solo mes, pero la prueba es la misma que se aplicaría a un volumen mayor: si
+una capa difiere, la diferencia se investiga antes de publicar.
+
 ---
 
 ## 4. Analítica y servicios
@@ -202,12 +350,39 @@ consultas parametrizadas, una lista permitida de dimensiones y un límite máxim
 de paginación de doscientas filas. Los errores de base se devuelven como errores
 explícitos.
 
+El contrato se organiza por preguntas de negocio. `kpis` devuelve los seis
+indicadores del periodo; `tendencias` entrega la serie y la variación frente al
+periodo anterior; `detalle` lista las líneas con paginación; `filtros` publica los
+valores disponibles para fecha, local, sección y producto; `agrupado` resume por
+una dimensión permitida; y `monitor` informa el estado del pipeline y de la
+calidad. `health` y la raíz completan el servicio sin exponer datos de negocio.
+
+La seguridad de la API se apoya en tres controles. Las consultas usan parámetros y
+nunca concatenan texto del usuario; las dimensiones de agrupación se validan
+contra una lista permitida; y la paginación tiene un tope. Cuando la base no
+responde, la API devuelve un error explícito en lugar de una lista vacía, porque
+una lista vacía se confundiría con un periodo sin ventas y llevaría a una
+conclusión equivocada.
+
 ### 4.2 Panel web
 
 El panel muestra seis indicadores, filtros por fecha y tres dimensiones,
 tendencia histórica, comparación entre periodos, agrupados, tabla de detalle
 paginada y exportación a CSV. También informa la fecha de última actualización
 tomada de la auditoría del ETL.
+
+La interfaz se pensó para que el usuario no tenga que conocer el modelo. Los
+filtros se presentan como listas de valores reales, no como campos de texto
+libre, y se combinan entre sí. Si una combinación no devuelve filas, el panel lo
+indica y conserva los filtros para que la persona los corrija en lugar de
+reiniciarlos. Esa decisión evita el bucle de volver a seleccionar todo desde cero.
+
+El panel no calcula cifras. Cada tarjeta, serie y tabla proviene de una llamada
+HTTP a la API, y la exportación a CSV reproduce exactamente las filas filtradas.
+Esa restricción es intencional: si el panel sumara por su cuenta, existirían dos
+definiciones de ventas y la reconciliación dejaría de tener sentido. La fecha de
+última actualización se lee de la auditoría del ETL, de modo que una cifra
+correcta pero antigua se puede detectar a simple vista.
 
 ### 4.3 Modelo predictivo
 
@@ -218,6 +393,25 @@ verificación del algoritmo se realizó con una serie sintética identificada co
 tal, en la que el error absoluto medio fue de 38.9 frente a 480.0 de la línea
 base.
 
+La división temporal es la decisión metodológica más importante del componente.
+Una división aleatoria habría mezclado meses futuros con meses pasados y habría
+producido métricas optimistas que no se sostienen en producción. Al entrenar con
+el pasado y evaluar con el tramo siguiente, la métrica refleja el uso real: predecir
+un periodo que el modelo no vio.
+
+La línea base cumple una función de control. Si el modelo no supera a una regla
+simple, no hay razón para desplegarlo. En la serie sintética el modelo mejora de
+forma clara, pero esa comparación no se traslada a las ventas reales porque no hay
+historia suficiente. El servicio declara el estado `insufficient_data` y se niega
+a publicar un número que no puede sostener; esa negativa es parte del diseño, no
+un fallo.
+
+El modelo se versiona y se guarda con sus parámetros. Cada artefacto registra la
+versión, los periodos de entrenamiento y prueba y las métricas obtenidas, de modo
+que una predicción se puede asociar con el experimento que la produjo. Cuando no
+existe un artefacto válido, el endpoint devuelve el diagnóstico del entrenamiento
+en lugar de una predicción vacía.
+
 ### 4.4 Asistente de lenguaje natural
 
 El asistente normaliza la pregunta, la clasifica en una de las diez intenciones
@@ -226,12 +420,48 @@ incluye las fuentes y un indicador de verificabilidad. Cuando la pregunta está
 fuera de alcance, responde que no hay datos. El modelo de lenguaje no ejecuta SQL
 ni genera cifras.
 
+La normalización elimina acentos, unifica mayúsculas y espacios y extrae
+parámetros como años, locales o productos. La clasificación es determinista: una
+lista de palabras clave asigna la intención y, si hay ambigüedad, se aplican
+reglas de prioridad. Esa simplicidad es una ventaja para auditar: ante una
+respuesta, se puede explicar exactamente por qué se eligió esa consulta.
+
+El indicador de verificabilidad distingue una respuesta respaldada por el Data
+Warehouse de una respuesta general. Si la consulta aprobada devuelve datos, la
+respuesta se marca como verificada y cita el servicio y el endpoint de origen. Si
+no hay datos, la respuesta lo dice. En el modo general, el texto del modelo local
+se muestra separado y marcado como no verificado, porque no proviene de la base.
+
+El asistente tampoco acepta SQL libre. Esa restricción reduce la flexibilidad,
+pero elimina dos riesgos: la inyección de consultas y la generación de cifras que
+nadie puede reconstruir. En las diez preguntas de prueba, el intérprete acertó la
+intención y la respuesta coincidió con el endpoint previsto, lo que demuestra que
+el asistente traduce la pregunta y no inventa cifras.
+
 ### 4.5 Avisos y monitoreo
 
 El motor evalúa seis reglas sobre los indicadores, el estado del modelo y las
 filas rechazadas. Cada aviso incluye severidad, valor observado, umbral y acción
 sugerida. La deduplicación por clave de evento evita notificaciones repetidas y
 la vista de monitoreo integra el estado del pipeline, del modelo y de los avisos.
+
+Las reglas cubren dos dimensiones del negocio. Las de ventas comparan el periodo
+con umbrales absolutos y con el periodo anterior: ventas bajas, ticket bajo y
+caída mayor al quince por ciento. Las de modelo y calidad vigilan la salud del
+sistema: modelo sin entrenar, error alto y rechazos sin resolver. Separar ambos
+grupos permite distinguir un problema de negocio de un problema operativo.
+
+La deduplicación usa una clave compuesta por el código de la regla, la entidad, el
+periodo y la fecha de actualización de los datos. Si la misma condición se evalúa
+dos veces sobre los mismos datos, el aviso no se duplica; si los datos se cargan
+de nuevo, se genera un evento nuevo. Esa decisión evita el ruido de notificaciones
+repetidas sin ocultar un cambio real en la magnitud del desvío.
+
+El registro de entregas guarda cada intento por alerta y canal, de modo que se
+puede saber qué se generó, qué se entregó y qué falló. La vista de monitoreo
+reúne el estado del pipeline, del modelo y de los avisos en una sola página. Los
+eventos simulados se identifican como tales para que una prueba no se confunda con
+una alerta real.
 
 ---
 
@@ -241,6 +471,13 @@ El repositorio incluye, además de la plataforma de datos, un bot de Telegram pa
 el restaurante "El Gordo", desarrollado en Node.js con Express. Es un proyecto
 independiente: **no consume el Data Warehouse ni la API de indicadores** y se
 entrega como ejemplo de integración con un canal de mensajería.
+
+La independencia es deliberada. El bot resuelve un proceso transaccional
+—recibir un pedido, prepararlo y entregarlo— y no un proceso analítico. Mezclar
+ambos habría exigido que el bot escribiera en el Data Warehouse o que la
+plataforma dependiera de un servicio externo para arrancar. Al mantenerlos
+separados, cada uno se puede demostrar por su cuenta y la entrega no arrastra las
+credenciales de Telegram a la plataforma de datos.
 
 ### 5.1 Componentes
 
@@ -252,6 +489,17 @@ entrega como ejemplo de integración con un canal de mensajería.
 - `web/dashboard.js`: servidor Express con la API de pedidos, la autenticación por
   token y los archivos estáticos del panel.
 - `web/public/`: interfaz del panel de administración.
+
+La separación de archivos sigue el mismo criterio que la plataforma: una unidad
+por responsabilidad. `bot.js` conoce la conversación y no la persistencia;
+`store.js` guarda y recupera pedidos sin conocer Telegram; y el panel consume el
+mismo almacén a través de una API. Esa frontera evita duplicar la lógica de
+pedidos y permite que el bot y el panel muestren exactamente el mismo estado.
+
+La persistencia usa memoria y un archivo `orders.json`. La memoria mantiene la
+lectura rápida y el archivo sobrevive al reinicio. El archivo no se versiona
+porque contiene datos de clientes y cambia con cada pedido; su exclusión está
+declarada en `.gitignore` y en el manual.
 
 ### 5.2 Flujo del cliente
 
@@ -292,12 +540,38 @@ CSV. El acceso requiere un token configurado en el entorno.
 Los estados posibles son `pendiente`, `en_preparacion`, `entregado` y
 `cancelado`; cada cambio se refleja en el panel y se notifica al cliente.
 
+El control de acceso usa un token en la URL, adecuado para un panel local pero no
+para producción. La recomendación es no compartir el enlace con el token y
+rotarlo si se filtró. La exportación genera Excel y CSV a partir del mismo
+conjunto filtrado, de modo que el cierre del día se puede archivar o enviar sin
+volver a capturar datos.
+
+El panel también concentra la operación del restaurante: muestra los pedidos
+recientes, permite filtrar por estado y fecha, y conserva el historial aunque el
+bot se reinicie. Esa continuidad importa porque un pedido a medio preparar no
+puede perderse si el proceso se cae.
+
 ### 5.5 Alcance
 
 El bot demuestra un flujo completo de pedidos y reservas, pero no forma parte de
 los criterios de la rúbrica de ingeniería de datos. Su dependencia es un token de
 BotFather y la red; las credenciales y los pedidos quedan fuera del control de
 versiones.
+
+La decisión de incluirlo responde a una razón pedagógica: mostrar que los datos
+pueden alimentar canales distintos. El bot no analiza ventas, pero su panel
+produce un cierre diario que, en un escenario real, podría integrarse al pipeline
+como una fuente transaccional más. Esa integración no se implementó y se declara
+como trabajo futuro, porque habría exigido definir un contrato de datos y un
+proceso de calidad para pedidos.
+
+El bot se verificó con un recorrido manual del flujo de compra y con un plan de
+pruebas documentado en `tests/README.md`. Ese plan define casos unitarios para el
+catálogo, el carrito y el almacén, y casos de integración para el checkout, el
+cambio de estado, las reservas y el panel. Los archivos de prueba no se
+implementaron, de modo que el plan quedó como especificación y no como suite
+automatizada. Tampoco se ejecutó una prueba de carga ni una auditoría de seguridad
+del panel, así que su alcance es demostrativo.
 
 ---
 
@@ -327,6 +601,30 @@ de agua y que el reintento termina con los conteos intactos. La prueba de punta 
 punta recorre la fuente, el Data Warehouse, la API, el panel, el asistente, el
 modelo y los avisos.
 
+Las pruebas se agruparon por lo que demuestran, no por la herramienta que las
+ejecuta. Las cinco primeras validan el comportamiento del pipeline: que la carga
+inicial deje los conteos esperados, que la incremental no duplique, que la
+reejecución sea idempotente, que los nulos y duplicados se detecten y que las
+claves foráneas se respeten. La sexta prueba el peor escenario: una conexión que
+falla a mitad de la carga. Las siguientes verifican la reconciliación, el panel,
+el modelo, el asistente, los avisos y el recorrido completo.
+
+Cada evidencia quedó en un archivo de la carpeta `documentation/evidencias`, con
+el comando ejecutado y la salida obtenida. Esa decisión permite que un revisor
+repita la prueba y compare. También obliga a que la evidencia sea de una ejecución
+real: si el comando no se puede volver a correr, la evidencia no sirve.
+
+La prueba de idempotencia merece una nota aparte. Se ejecuta dos veces el mismo
+lote y se comparan los conteos antes y después. Si la segunda ejecución inserta
+filas nuevas, el pipeline no es idempotente y el error se detecta en la prueba y
+no en producción. Ese control es el que permite decir que la carga incremental es
+segura de repetir.
+
+La prueba de punta a punta es la más costosa y la más informativa. Recorre todos
+los componentes en orden y falla si alguno devuelve un contrato distinto al
+esperado. No reemplaza a las pruebas específicas, pero detecta incompatibilidades
+entre servicios que las pruebas aisladas no ven.
+
 Tabla 8
 
 *Resultados técnicos*
@@ -342,9 +640,26 @@ Tabla 8
 | Huérfanos en el hecho | 0 |
 | Secretos versionados | 0 |
 
+Los resultados se leen en dos niveles. En el nivel de cobertura, el proyecto
+completa los siete componentes, las quince reglas de calidad y las seis reglas de
+aviso. En el nivel de calidad, la reconciliación sin diferencias y la ausencia de
+huérfanos indican que el modelo no perdió filas al integrarse. La ausencia de
+secretos versionados es también un resultado: se verificó que el repositorio no
+contiene tokens ni credenciales.
+
+El número de filas es pequeño y no debe interpretarse como una medida de escala.
+La fuente de práctica tiene cinco líneas y un mes; el valor de la evidencia está
+en que las cuatro capas coinciden exactamente y en que el procedimiento se puede
+repetir con más datos sin cambiar el código.
+
 ---
 
 ## 7. Trazabilidad con la rúbrica
+
+La trazabilidad responde a una pregunta concreta: qué evidencia sostiene cada
+criterio de evaluación. La tabla 9 relaciona los nueve criterios con las tareas
+del backlog y con el artefacto que permite verificarlos. No se asigna a un
+criterio una tarea que no haya producido evidencia.
 
 Tabla 9
 
@@ -361,6 +676,21 @@ Tabla 9
 | Automatización | 5 % | T13 | Motor de avisos y monitoreo |
 | Pruebas y documentación | 10 % | T14 | Plan de pruebas y evidencias |
 | Demo y comunicación | 5 % | T15 | Guion de demo |
+
+La tabla muestra dos asimetrías que conviene explicar. La primera es que el
+criterio de pruebas y documentación depende de una sola tarea (T14) pero concentra
+evidencias de todas las demás; por eso su peso no refleja el esfuerzo, sino la
+verificación final. La segunda es que la demo (T15) tiene peso bajo y, aun así,
+quedó parcial: no se grabó el video ni se ensayó la presentación. Esa brecha no
+cambia el funcionamiento del sistema, pero sí la evidencia de comunicación.
+
+El criterio de análisis y arquitectura se sostiene con los ADR y con el modelo
+entidad-relación. El de ETL y calidad, con los scripts de staging y el catálogo
+de reglas. El de modelo dimensional, con el esquema estrella y la reconciliación.
+El de panel y API, con los contratos y las capturas de las pruebas. El de Machine
+Learning, con la evidencia del modelo y su línea base. El de Generative AI, con
+las diez preguntas documentadas. Y el de automatización, con el motor de avisos y
+la vista de monitoreo.
 
 ---
 
@@ -380,6 +710,24 @@ Tabla 10
 | Autenticación básica | Propia del despliegue local | No apta para producción | Integrar un proveedor de identidad |
 | Fuente desnormalizada | Sin clientes, empleados ni geografía | Dimensiones no aplicables | Declarado como restricción |
 
+Los riesgos se clasificaron por su efecto sobre la entrega. Dos afectan el
+cumplimiento formal (Docker y la demo); dos afectan la profundidad del análisis
+(la ventana de datos y la dimensión de tipo 1); y tres son decisiones de alcance
+que conviene declarar (canal de avisos, autenticación y fuente desnormalizada).
+Ninguno de los riesgos compromete la exactitud de los totales, que es la propiedad
+central del proyecto.
+
+La gestión del riesgo fue explícita. Cada riesgo tiene un plan y un responsable
+implícito en la tarea asociada. Los que dependían de una instalación externa
+—Docker— se aceptaron como parciales en lugar de simular una solución. Los que
+dependían de datos —la historia insuficiente— se resolvieron haciendo que el
+sistema reconozca el límite y no publique métricas sin sustento.
+
+El riesgo con mayor probabilidad de materializarse es el de la demo. Un video sin
+grabar y un ensayo no realizado dejan poco margen ante un fallo de red o de base.
+La mitigación natural es grabar con anticipación y preparar capturas de respaldo;
+ambas acciones quedaron pendientes y se declaran en la sección 9.
+
 ---
 
 ## 9. Requisitos no cumplidos y pendientes
@@ -388,7 +736,16 @@ Esta sección enumera de forma explícita lo que **no** se cumplió. No se prese
 como terminado lo que quedó parcial ni se sustituyen evidencias faltantes con
 texto descriptivo.
 
+La revisión se hizo criterio por criterio contra las tarjetas del backlog y contra
+el contenido real del repositorio. Cuando una tarjeta pedía un archivo, se buscó
+el archivo; cuando pedía una captura, se buscó la captura; cuando pedía un
+comando, se ejecutó el comando. Esa verificación es la que permite distinguir una
+tarea cerrada de una tarea declarada como cerrada.
+
 ### 9.1 Criterios de aceptación no cumplidos
+
+La tabla 11 recoge los seis criterios que no se cumplieron. Tres pertenecen a T01
+y tres a T15, las dos únicas tareas que quedaron parciales.
 
 Tabla 11
 
@@ -403,7 +760,26 @@ Tabla 11
 | T15 | Ensayo completo de la demo y checklist marcado | No se realizaron | Riesgo de errores en la presentación |
 | T15 | Plan B con capturas o video | No se preparó | Sin respaldo ante una falla de red o de base |
 
+Las consecuencias de estas brechas son distintas. En T01, la ausencia de
+contenedores y de un usuario técnico significa que el ambiente depende de una
+instalación previa de SQL Server y de una cuenta con privilegios. Quien reciba el
+repositorio puede ejecutar el pipeline, pero no reconstruir la fuente desde cero
+con un solo comando. En T15, la ausencia de video y de ensayo no impide que el
+sistema funcione, pero reduce la evidencia disponible para la evaluación de
+comunicación.
+
+Ninguna de las brechas se ocultó con una solución aparente. No se agregó un
+`docker-compose.yml` vacío para marcar el criterio, ni se declaró un usuario
+técnico que no existe, ni se presentó un video de diapositivas como demostración.
+La decisión fue declarar la brecha y explicar qué haría falta para cerrarla.
+
 ### 9.2 Pendientes técnicos no incluidos
+
+La tabla 12 distingue los pendientes estrictamente técnicos de las mejoras que
+quedaron fuera del alcance acordado. Son ocho elementos: un canal de avisos
+externo, la predicción con datos reales, las métricas sobre ventas reales, la
+autenticación, la dimensión de tipo 2, la fuente desnormalizada, el despliegue con
+contenedores y la rotación del token del bot.
 
 Tabla 12
 
@@ -420,6 +796,18 @@ Tabla 12
 | Despliegue con contenedores | No ejecutado | Docker no estaba instalado | Probar el despliegue y registrar la evidencia |
 | Rotación del token del bot | Pendiente | Se detectó un token en el historial de un repositorio de trabajo, no en la entrega publicada | Revocarlo y generar uno nuevo en BotFather |
 
+Los pendientes tienen distinto costo de cierre. La rotación del token es inmediata
+y no requiere código. El canal de avisos y la autenticación requieren decisiones
+de producto. La predicción con datos reales y la dimensión de tipo 2 dependen de
+una fuente más rica. El despliegue con contenedores depende de una instalación
+externa. Ordenarlos por costo evita tratar todos los pendientes como si tuvieran
+la misma prioridad.
+
+La lista también cumple una función de transparencia. Un lector puede tomar
+cualquiera de estos puntos y verificar que no está implementado, en lugar de
+suponerlo por lo que dice el resto del informe. En ese sentido, la sección 9 es la
+contraparte de la sección 6: una muestra lo que se probó y la otra lo que falta.
+
 ### 9.3 Cumplimiento global
 
 De los quince entregables, trece se cerraron y dos quedaron parciales (T01 y
@@ -427,6 +815,24 @@ T15). Las brechas de T01 afectan la reproducibilidad del ambiente, no la calidad
 de los datos procesados; las de T15 afectan la evidencia de la demo, no el
 funcionamiento del sistema. El resto de los pendientes son mejoras declaradas y
 no requisitos incumplidos.
+
+Si se mira la rúbrica, el criterio de análisis y arquitectura (10 %) sigue
+respaldado por T02 y T03, que sí se cerraron; lo que falta en T01 es la
+reproducibilidad del ambiente, no el análisis. El criterio de demo y comunicación
+(5 %) queda sin evidencia porque depende del video y del ensayo. Los demás
+criterios conservan su evidencia y no se ven afectados por estas brechas.
+
+Cerrar T01 exige dos acciones concretas: publicar un `docker-compose.yml` o un
+script que cree y cargue la base fuente, y definir un usuario de aplicación con
+permisos mínimos. Cerrar T15 exige grabar el video de cinco minutos, ensayar la
+demo y preparar capturas de respaldo. Ninguna de las dos acciones cambia el
+código de la plataforma; ambas son trabajo de empaquetado y de comunicación.
+
+La conclusión de esta sección es que el proyecto prefiere una entrega verificable
+con brechas declaradas antes que una entrega aparentemente completa. Esa
+preferencia es coherente con el resto del sistema: el modelo no publica métricas
+sin datos, el asistente no inventa cifras y el pipeline no imputa valores. El
+informe aplica el mismo criterio a su propio cumplimiento.
 
 ---
 
@@ -507,16 +913,44 @@ coinciden; el panel y el asistente no calculan cifras por su cuenta; el modelo n
 publica métricas cuando no tiene historia suficiente; y el asistente declara sus
 fuentes o reconoce que no tiene datos.
 
+Esa coherencia se apoya en decisiones que se tomaron antes de escribir código: un
+solo punto de acceso a la base, un grano de hecho explícito, reglas de calidad con
+código estable y una política de cuarentena que no imputa valores. Si alguna de
+esas decisiones se hubiera relajado para avanzar más rápido, el sistema habría
+producido cifras con apariencia de verdad y sin forma de auditarlas. El costo de
+la disciplina fue un poco más de trabajo en el ETL; el beneficio es que cada total
+se puede reconstruir.
+
+El proyecto también deja una lección sobre el alcance. La tentación de agregar
+funciones —un canal de correo, un inicio de sesión completo, una dimensión
+histórica— habría mejorado la demostración y habría debilitado la evidencia,
+porque cada función nueva exige pruebas y documentación que no estaban
+presupuestadas. La lista de pendientes de la sección 9 es, en ese sentido, una
+decisión de honestidad y no una omisión accidental.
+
 Las dos tareas parciales están acotadas y justificadas en la sección 9. La
 primera depende de la instalación de Docker y de un usuario técnico con permisos
 mínimos, que no estaban disponibles. La segunda depende de la grabación del video
 y del ensayo formal. Ninguna afecta los criterios no recortables de la rúbrica,
 pero se declaran para que la evaluación no suponga un cumplimiento que no existe.
 
+El balance técnico es positivo. La plataforma procesa datos reales, reconcilia
+capas, publica indicadores, responde preguntas y genera avisos en un entorno
+local sin depender de servicios pagos. El bot de Telegram agrega un canal de
+negocio distinto y demuestra que la arquitectura de servicios se puede extender
+sin tocar el Data Warehouse. Y la documentación permite que otra persona repita
+el recorrido sin asistencia.
+
 Como siguiente paso se recomienda ampliar la ventana de datos para habilitar el
 análisis histórico y el modelo predictivo, agregar el canal de avisos que defina
 el negocio, completar el video y el ensayo, y automatizar la verificación de punta
 a punta con un solo comando.
+
+Si se prioriza una sola mejora, debería ser la ampliación de la ventana de datos.
+Con más historia, el modelo predictivo deja de ser una demostración metodológica y
+se convierte en una herramienta útil; además, el panel gana comparaciones
+interanuales y los avisos de tendencia adquieren sentido. Las demás mejoras son
+valiosas, pero ninguna desbloquea tantas capacidades a la vez.
 
 ---
 
