@@ -18,8 +18,18 @@ Examen2026Noviembre/
   data-platform/     Plataforma de datos: ETL, DW, API, dashboard, ML, GenAI y alertas
   Tareas_SCRUM/      Backlog, plan de sprints, tarjetas T01-T15 y guia del proyecto
   bot-telegram/      Proyecto de ejemplo: bot de Telegram con panel web (Node.js)
+  documentacion/     Manual de usuario e informe final (Markdown y Word)
   README.md          Este archivo
 ```
+
+### `documentacion/`
+
+| Archivo | Contenido |
+|---|---|
+| `manual_usuario.md` | Guia de uso del panel, el asistente, los avisos y el bot |
+| `manual_usuario.docx` | La misma guia en Word con formato APA 7 |
+| `informe.md` | Informe final: objetivos, arquitectura, resultados y trazabilidad |
+| `informe.docx` | El mismo informe en Word con formato APA 7 |
 
 ### `data-platform/`
 
