@@ -196,7 +196,8 @@ justificar.
 
 ### 4.1 API de indicadores
 
-La API expone seis endpoints de negocio, además del estado y el monitoreo. Usa
+La API expone seis endpoints de consulta (indicadores, tendencias, detalle,
+filtros, agrupado y monitoreo), además del estado del servicio y la raíz. Usa
 consultas parametrizadas, una lista permitida de dimensiones y un límite máximo
 de paginación de doscientas filas. Los errores de base se devuelven como errores
 explícitos.
