@@ -237,22 +237,73 @@ la vista de monitoreo integra el estado del pipeline, del modelo y de los avisos
 
 ## 5. Proyecto de ejemplo: bot de Telegram
 
-El repositorio incluye un bot de Telegram para el restaurante "El Gordo",
-desarrollado en Node.js con Express. Permite consultar el menú, armar un
-carrito, confirmar pedidos de delivery o retiro, solicitar reservas y recibir
-avisos de cambio de estado.
+El repositorio incluye, además de la plataforma de datos, un bot de Telegram para
+el restaurante "El Gordo", desarrollado en Node.js con Express. Es un proyecto
+independiente: **no consume el Data Warehouse ni la API de indicadores** y se
+entrega como ejemplo de integración con un canal de mensajería.
 
-El administrador dispone de comandos para consultar pedidos y de un panel web con
-actualización automática, filtros, cambio de estado y exportación a Excel y CSV.
-El bot no consume el Data Warehouse ni la API de indicadores: es un proyecto
-independiente que se entrega como ejemplo de integración con un canal de
-mensajería.
+### 5.1 Componentes
+
+- `bot.js`: flujos de conversación, menús, carrito, pedidos, reservas y comandos.
+- `menu.js`: catálogo del restaurante, con categorías, platos, descripciones y
+  precios en lempiras.
+- `store.js`: persistencia de pedidos en memoria y en `orders.json`, que no se
+  versiona.
+- `web/dashboard.js`: servidor Express con la API de pedidos, la autenticación por
+  token y los archivos estáticos del panel.
+- `web/public/`: interfaz del panel de administración.
+
+### 5.2 Flujo del cliente
+
+1. El cliente abre el bot y pulsa **Iniciar** o envía `/start`.
+2. Recorre las categorías, elige un plato y lo agrega al carrito.
+3. Ajusta cantidades o elimina productos desde el carrito.
+4. Finaliza el pedido y elige **Delivery** o **Retiro en local**.
+5. Confirma; el bot valida que el carrito no esté vacío, registra el pedido,
+   envía el resumen al administrador y devuelve el número de pedido.
+
+El bot también admite reservas, que llegan al administrador para su confirmación.
+
+### 5.3 Comandos
+
+Tabla 6
+
+*Comandos del bot de Telegram*
+
+| Comando | Uso |
+|---|---|
+| `/start` | Abrir el menú principal |
+| `/menu` | Ver categorías y platos |
+| `/carrito` | Revisar y modificar el pedido |
+| `/cancelar` | Cancelar el pedido en curso |
+| `/compartir` | Obtener el enlace para compartir el bot |
+| `/miid` | Ver el identificador de Telegram del usuario |
+| `/pedidos` | Administrador: pedidos recientes |
+| `/pendientes` | Administrador: solo pedidos pendientes |
+
+### 5.4 Panel web de pedidos
+
+El panel se monta dentro del mismo proceso del bot y comparte el mismo
+almacén, de modo que el bot y el panel ven los mismos pedidos. Se actualiza cada
+cinco segundos, permite filtrar por estado y fecha, cambiar el estado de un
+pedido, avisar al cliente por Telegram y exportar el cierre del día a Excel o
+CSV. El acceso requiere un token configurado en el entorno.
+
+Los estados posibles son `pendiente`, `en_preparacion`, `entregado` y
+`cancelado`; cada cambio se refleja en el panel y se notifica al cliente.
+
+### 5.5 Alcance
+
+El bot demuestra un flujo completo de pedidos y reservas, pero no forma parte de
+los criterios de la rúbrica de ingeniería de datos. Su dependencia es un token de
+BotFather y la red; las credenciales y los pedidos quedan fuera del control de
+versiones.
 
 ---
 
 ## 6. Pruebas y resultados
 
-Tabla 6
+Tabla 7
 
 *Pruebas de la rúbrica*
 
@@ -276,7 +327,7 @@ de agua y que el reintento termina con los conteos intactos. La prueba de punta 
 punta recorre la fuente, el Data Warehouse, la API, el panel, el asistente, el
 modelo y los avisos.
 
-Tabla 7
+Tabla 8
 
 *Resultados técnicos*
 
@@ -295,7 +346,7 @@ Tabla 7
 
 ## 7. Trazabilidad con la rúbrica
 
-Tabla 8
+Tabla 9
 
 *Correspondencia entre criterios, tareas y evidencias*
 
@@ -315,7 +366,7 @@ Tabla 8
 
 ## 8. Riesgos y limitaciones
 
-Tabla 9
+Tabla 10
 
 *Riesgos y deuda técnica*
 
@@ -328,6 +379,54 @@ Tabla 9
 | Dimensión de tipo 1 | Sin historial de atributos | No permite analizar cambios | Evolucionar a tipo 2 |
 | Autenticación básica | Propia del despliegue local | No apta para producción | Integrar un proveedor de identidad |
 | Fuente desnormalizada | Sin clientes, empleados ni geografía | Dimensiones no aplicables | Declarado como restricción |
+
+---
+
+## 9. Requisitos no cumplidos y pendientes
+
+Esta sección enumera de forma explícita lo que **no** se cumplió. No se presenta
+como terminado lo que quedó parcial ni se sustituyen evidencias faltantes con
+texto descriptivo.
+
+### 9.1 Criterios de aceptación no cumplidos
+
+Tabla 11
+
+*Criterios de aceptación que no se cumplieron*
+
+| Tarea | Criterio | Situación real | Impacto |
+|---|---|---|---|
+| T01 | La base fuente se levanta con un comando documentado | No existe `docker-compose.yml` ni un script que cree y cargue la base `Venta`; el README indica que la fuente ya existe en la instancia local | El ambiente no se reconstruye desde cero en otro equipo |
+| T01 | Usuario de aplicación con permisos mínimos | Los scripts no crean `LOGIN`, `USER` ni `GRANT`; la conexión usa autenticación integrada de Windows (`sqlcmd -E`) | Se opera con una cuenta administrativa |
+| T01 | Evidencia de `docker-compose.yml` o script de restauración | No se incluyó ninguno de los dos | T01 queda parcial |
+| T15 | Video de cinco minutos | No se grabó | El 5 % de la rúbrica queda sin evidencia |
+| T15 | Ensayo completo de la demo y checklist marcado | No se realizaron | Riesgo de errores en la presentación |
+| T15 | Plan B con capturas o video | No se preparó | Sin respaldo ante una falla de red o de base |
+
+### 9.2 Pendientes técnicos no incluidos
+
+Tabla 12
+
+*Pendientes y mejoras fuera del alcance entregado*
+
+| Elemento | Estado | Motivo | Acción recomendada |
+|---|---|---|---|
+| Canal de avisos externo (correo o Telegram) | Solo panel y registro interno | La versión publicada no configura un canal saliente | Definir el canal con el negocio e integrarlo |
+| Predicción con datos reales | No disponible | Un solo mes y cinco líneas; el servicio responde `insufficient_data` | Ampliar la ventana histórica |
+| Métricas del modelo sobre ventas reales | No disponibles | El MAE de 38.9 frente a 480.0 se midió en una serie sintética identificada | Reentrenar y evaluar con historia real |
+| Autenticación en la API y el panel | Sin inicio de sesión en la versión publicada | Quedó fuera del alcance acordado | Integrar un proveedor de identidad |
+| Dimensión de tipo 2 | Solo tipo 1 | El alcance fijó tipo 1 | Versionar atributos para analizar cambios |
+| Fuente desnormalizada | Sin clientes, empleados ni geografía | Limitación de la fuente | Mantenerla documentada como restricción |
+| Despliegue con contenedores | No ejecutado | Docker no estaba instalado | Probar el despliegue y registrar la evidencia |
+| Rotación del token del bot | Pendiente | Se detectó un token en el historial de un repositorio de trabajo, no en la entrega publicada | Revocarlo y generar uno nuevo en BotFather |
+
+### 9.3 Cumplimiento global
+
+De los quince entregables, trece se cerraron y dos quedaron parciales (T01 y
+T15). Las brechas de T01 afectan la reproducibilidad del ambiente, no la calidad
+de los datos procesados; las de T15 afectan la evidencia de la demo, no el
+funcionamiento del sistema. El resto de los pendientes son mejoras declaradas y
+no requisitos incumplidos.
 
 ---
 
@@ -346,27 +445,27 @@ Examen2026Noviembre/
 
 ### Anexo B. Estado de las tareas
 
-Tabla 10
+Tabla 13
 
 *Estado del backlog*
 
-| Tarea | Entregable | Estado |
-|---|---|---|
-| T01 | Entorno y fuente reproducible | Parcial |
-| T02 | Inventario, modelo y diccionario | Cerrada |
-| T03 | Arquitectura y decisiones | Cerrada |
-| T04 | Staging en tres zonas | Cerrada |
-| T05 | Extracción incremental idempotente | Cerrada |
-| T06 | Reglas de calidad | Cerrada |
-| T07 | Modelo dimensional | Cerrada |
-| T08 | Carga y reconciliación | Cerrada |
-| T09 | API de indicadores | Cerrada |
-| T10 | Panel web | Cerrada |
-| T11 | Modelo con línea base | Cerrada |
-| T12 | Asistente de lenguaje natural | Cerrada |
-| T13 | Avisos y monitoreo | Cerrada |
-| T14 | Documentación y pruebas | Cerrada |
-| T15 | Video y ensayo | Parcial |
+| Tarea | Entregable | Estado | Observación |
+|---|---|---|---|
+| T01 | Entorno y fuente reproducible | Parcial | Sin contenedores ni usuario técnico; ver 9.1 |
+| T02 | Inventario, modelo y diccionario | Cerrada | |
+| T03 | Arquitectura y decisiones | Cerrada | |
+| T04 | Staging en tres zonas | Cerrada | |
+| T05 | Extracción incremental idempotente | Cerrada | |
+| T06 | Reglas de calidad | Cerrada | |
+| T07 | Modelo dimensional | Cerrada | |
+| T08 | Carga y reconciliación | Cerrada | |
+| T09 | API de indicadores | Cerrada | |
+| T10 | Panel web | Cerrada | |
+| T11 | Modelo con línea base | Cerrada | Métricas sobre serie sintética; ver 9.2 |
+| T12 | Asistente de lenguaje natural | Cerrada | |
+| T13 | Avisos y monitoreo | Cerrada | Solo canal de panel; ver 9.2 |
+| T14 | Documentación y pruebas | Cerrada | |
+| T15 | Video y ensayo | Parcial | Sin video ni ensayo; ver 9.1 |
 
 ### Anexo C. Comandos de verificación
 
@@ -388,6 +487,11 @@ se documenta en archivos de ejemplo con valores vacíos y las credenciales se le
 del entorno local. Los datos de pedidos del bot y las dependencias instaladas
 también quedan fuera del control de versiones.
 
+Durante el desarrollo se detectó un token de bot en el historial de un repositorio
+de trabajo que no forma parte de esta entrega. El token no está publicado aquí,
+pero se recomienda revocarlo en BotFather y generar uno nuevo antes de reutilizar
+el bot.
+
 ---
 
 ## Conclusiones
@@ -403,14 +507,16 @@ coinciden; el panel y el asistente no calculan cifras por su cuenta; el modelo n
 publica métricas cuando no tiene historia suficiente; y el asistente declara sus
 fuentes o reconoce que no tiene datos.
 
-Las dos tareas parciales están acotadas y justificadas. La primera depende de la
-instalación de Docker, que no estaba disponible en el equipo. La segunda depende
-de la grabación del video y del ensayo formal. Ninguna afecta los criterios no
-recortables de la rúbrica.
+Las dos tareas parciales están acotadas y justificadas en la sección 9. La
+primera depende de la instalación de Docker y de un usuario técnico con permisos
+mínimos, que no estaban disponibles. La segunda depende de la grabación del video
+y del ensayo formal. Ninguna afecta los criterios no recortables de la rúbrica,
+pero se declaran para que la evaluación no suponga un cumplimiento que no existe.
 
 Como siguiente paso se recomienda ampliar la ventana de datos para habilitar el
 análisis histórico y el modelo predictivo, agregar el canal de avisos que defina
-el negocio y automatizar la verificación de punta a punta con un solo comando.
+el negocio, completar el video y el ensayo, y automatizar la verificación de punta
+a punta con un solo comando.
 
 ---
 
