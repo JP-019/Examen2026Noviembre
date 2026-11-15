@@ -1,0 +1,15 @@
+{
+  "name": "mi-restaurante-bot",
+  "version": "1.0.0",
+  "description": "Bot de Telegram para restaurante (menu, carrito, pedidos y reservas)",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "express": "^5.3.0",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}

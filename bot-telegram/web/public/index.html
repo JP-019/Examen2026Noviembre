@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c2410c'/%3E%3Cpath d='M22 14v12a4 4 0 0 0 8 0V14M26 30v20M44 14c-4 0-6 4-6 9s2 9 6 9M44 14v36' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <title>Pedidos — El Gordo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --surface-2: #f9fafb;
+      --text: #111827;
+      --text-soft: #374151;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --line-strong: #d1d5db;
+      --brand: #c2410c;
+      --brand-strong: #9a3412;
+      --brand-soft: #fff1e7;
+      --warning: #b45309;
+      --warning-soft: #fef3c7;
+      --info: #1d4ed8;
+      --info-soft: #dbeafe;
+      --success: #047857;
+      --success-soft: #d1fae5;
+      --danger: #b91c1c;
+      --danger-soft: #fee2e2;
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --shadow: 0 10px 28px rgba(16, 24, 40, 0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 420px at 12% -8%, #fff4e8 0%, rgba(255, 244, 232, 0) 62%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection { background: #fed7aa; color: #7c2d12; }
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+
+    :focus-visible {
+      outline: 2px solid rgba(194, 65, 12, 0.45);
+      outline-offset: 2px;
+    }
+
+    /* ---------- Barra superior ---------- */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px clamp(16px, 3vw, 32px);
+      background: rgba(255, 255, 255, 0.86);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(145deg, #f97316 0%, #c2410c 55%, #9a3412 100%);
+      box-shadow: 0 6px 16px rgba(194, 65, 12, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-text { min-width: 0; }
+    .brand-eyebrow {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    .live {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: #065f46;
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .live .dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+      animation: pulse 2s infinite;
+    }
+    .live.offline { background: var(--danger-soft); color: #991b1b; }
+    .live.offline .dot { background: #ef4444; animation: none; box-shadow: none; }
+    .live-label { display: none; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .icon-btn:hover { color: var(--text); border-color: var(--line-strong); background: var(--surface-2); }
+    .icon-btn:disabled { opacity: 0.6; cursor: wait; }
+    .icon-btn svg { width: 17px; height: 17px; }
+    .icon-btn.spinning svg { animation: spin 0.8s linear infinite; }
+
+    .icon-btn.danger {
+      width: 30px;
+      height: 30px;
+      border-color: transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #9ca3af;
+    }
+    .icon-btn.danger:hover {
+      background: var(--danger-soft);
+      border-color: #fecaca;
+      color: var(--danger);
+    }
+    .icon-btn.danger svg { width: 15px; height: 15px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---------- Contenido ---------- */
+    main {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      padding: 28px clamp(16px, 3vw, 32px) 48px;
+    }
+
+    .banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      background: var(--danger-soft);
+      color: #991b1b;
+      font-size: 13.5px;
+      font-weight: 500;
+    }
+    .banner svg { width: 18px; height: 18px; flex: 0 0 auto; }
+
+    .page-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .page-head h2 {
+      margin: 0 0 4px;
+      font-size: clamp(22px, 2.4vw, 28px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .page-head p { margin: 0; color: var(--muted); font-size: 13.5px; }
+
+    .head-actions { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label {
+      padding-left: 2px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #exportDate {
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 38px;
+      padding: 0 14px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+      transition: background 0.16s, transform 0.16s, border-color 0.16s;
+    }
+    .btn-export svg { width: 15px; height: 15px; }
+    .btn-export:hover { background: var(--brand-strong); transform: translateY(-1px); }
+
+    .btn-export.secondary {
+      background: var(--surface);
+      border-color: var(--line-strong);
+      color: var(--text-soft);
+    }
+    .btn-export.secondary:hover { background: var(--surface-2); border-color: #9ca3af; }
+
+    .btn-export.ghost {
+      padding: 0 10px;
+      background: transparent;
+      border-color: transparent;
+      color: var(--muted);
+      box-shadow: none;
+    }
+    .btn-export.ghost:hover { background: rgba(17, 24, 39, 0.05); color: var(--text); transform: none; }
+
+    /* ---------- Estadísticas ---------- */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+    }
+    .stat-icon svg { width: 18px; height: 18px; }
+
+    .tone-neutral { background: #f3f4f6; color: #4b5563; }
+    .tone-warning { background: var(--warning-soft); color: var(--warning); }
+    .tone-info { background: var(--info-soft); color: var(--info); }
+    .tone-success { background: var(--success-soft); color: var(--success); }
+    .tone-brand { background: var(--brand-soft); color: var(--brand); }
+
+    .stat-body { display: flex; flex-direction: column; min-width: 0; }
+    .stat-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-value.money { font-size: 18px; }
+
+    /* ---------- Barra de filtros ---------- */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 36px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text-soft);
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .filter:hover { background: var(--surface-2); border-color: var(--line-strong); }
+    .filter .count {
+      display: inline-grid;
+      place-items: center;
+      min-width: 20px;
+      height: 19px;
+      padding: 0 5px;
+      border-radius: 6px;
+      background: rgba(17, 24, 39, 0.06);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .filter.active {
+      background: var(--brand-soft);
+      border-color: rgba(194, 65, 12, 0.35);
+      color: var(--brand-strong);
+    }
+    .filter.active .count { background: rgba(194, 65, 12, 0.14); color: var(--brand-strong); }
+
+    .search { position: relative; flex: 0 1 330px; min-width: 220px; }
+    .search svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .search input {
+      width: 100%;
+      height: 36px;
+      padding: 0 12px 0 36px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search input::placeholder { color: #9ca3af; }
+    .search input:focus { border-color: rgba(194, 65, 12, 0.5); box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.1); }
+
+    /* ---------- Pedidos ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .order {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--status, var(--line-strong));
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+    }
+    .order:hover {
+      transform: translateY(-2px);
+      border-color: var(--line-strong);
+      border-top-color: var(--status, var(--line-strong));
+      box-shadow: var(--shadow);
+    }
+
+    .status-pendiente { --status: #f59e0b; }
+    .status-en_preparacion { --status: #3b82f6; }
+    .status-entregado { --status: #10b981; }
+    .status-cancelado { --status: #ef4444; }
+
+    .order-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .order-head-right { display: flex; align-items: center; gap: 6px; }
+    .order-id { font-size: 12.5px; font-weight: 500; color: var(--muted); }
+    .order-id span { margin-left: 3px; font-size: 14px; font-weight: 700; color: var(--text); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge-pendiente { background: var(--warning-soft); color: #92400e; }
+    .badge-en_preparacion { background: var(--info-soft); color: #1e40af; }
+    .badge-entregado { background: var(--success-soft); color: #065f46; }
+    .badge-cancelado { background: var(--danger-soft); color: #991b1b; }
+
+    .customer { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--brand-soft);
+      color: var(--brand-strong);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .customer-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .customer-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .customer-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .customer-phone svg { width: 12px; height: 12px; flex: 0 0 auto; }
+
+    .type-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .type-chip svg { width: 13px; height: 13px; }
+
+    .order-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .meta-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+    .meta-item svg { width: 13px; height: 13px; flex: 0 0 auto; }
+    .meta-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--info);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .meta-link:hover { text-decoration: underline; }
+    .meta-link svg { width: 13px; height: 13px; flex: 0 0 auto; }
+
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-2);
+    }
+    .item { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 12.5px; }
+    .qty {
+      display: inline-grid;
+      place-items: center;
+      min-width: 24px;
+      height: 20px;
+      padding: 0 5px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .item-name { flex: 1; min-width: 0; color: var(--text-soft); }
+    .item-price { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+    .breakdown { display: flex; flex-direction: column; gap: 3px; padding: 0 2px; }
+    .breakdown > div { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+    .breakdown span:last-child { font-variant-numeric: tabular-nums; }
+
+    .total-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+    .total-row span {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .total-row strong {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--brand-strong);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 36px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      color: var(--text-soft);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn svg { width: 14px; height: 14px; flex: 0 0 auto; }
+    .btn:hover { background: var(--surface-2); border-color: var(--line-strong); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn.prep { background: var(--info-soft); border-color: #bfdbfe; color: var(--info); }
+    .btn.prep:hover { background: #c9defc; }
+    .btn.done { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn.done:hover { background: #036c4e; }
+    .btn.cancel { flex: 1 1 auto; background: transparent; border-color: transparent; color: var(--danger); }
+    .btn.cancel:hover { background: var(--danger-soft); border-color: transparent; }
+
+    .order-closed {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px;
+      border: 1px dashed var(--line);
+      border-radius: 9px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .order-closed svg { width: 14px; height: 14px; }
+
+    .empty {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 64px 24px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface);
+      text-align: center;
+    }
+    .empty-icon {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+    .empty-icon svg { width: 26px; height: 26px; }
+    .empty h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
+    .empty p { margin: 0; max-width: 380px; color: var(--muted); font-size: 13px; }
+
+    /* ---------- Esqueletos de carga ---------- */
+    .skeleton { pointer-events: none; }
+    .sk {
+      border-radius: 6px;
+      background: linear-gradient(90deg, #eceef2 25%, #f6f7f9 37%, #eceef2 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+    .sk-label { width: 64px; height: 10px; }
+    .sk-value { width: 44px; height: 22px; margin-top: 8px; }
+    .sk-line { width: 70%; height: 12px; }
+    .sk-line.short { width: 40%; height: 10px; margin-top: 7px; }
+    .sk-items { width: 100%; height: 78px; border-radius: 10px; }
+    .sk-action { width: 100%; height: 36px; border-radius: 9px; }
+
+    @keyframes shimmer {
+      0% { background-position: 100% 50%; }
+      100% { background-position: 0 50%; }
+    }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      padding: 0 clamp(16px, 3vw, 32px) 28px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    footer strong { color: var(--text-soft); font-weight: 600; }
+
+    /* ---------- Adaptación a pantallas ---------- */
+    @media (max-width: 1100px) {
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .page-head { align-items: flex-start; }
+      .head-actions { width: 100%; }
+    }
+
+    @media (max-width: 680px) {
+      .topbar { padding: 12px 16px; }
+      .brand-eyebrow { display: none; }
+      .live { padding: 6px 10px; font-size: 11.5px; }
+      main { padding: 20px 16px 36px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .stat { gap: 10px; padding: 13px; }
+      .stat:last-child { grid-column: 1 / -1; }
+      .stat-icon { width: 34px; height: 34px; }
+      .stat-value { font-size: 19px; }
+      .stat-value.money { font-size: 16px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .filters {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+      }
+      .filters::-webkit-scrollbar { display: none; }
+      .search { width: 100%; flex: 1 1 auto; min-width: 0; }
+      .head-actions { gap: 6px; }
+      .field { flex: 1 1 140px; }
+      #exportDate { width: 100%; }
+      .btn-export { flex: 1 1 auto; }
+      .btn-export.ghost { flex: 0 0 auto; }
+      footer { padding: 0 16px 24px; }
+    }
+
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      #lastUpdate { display: none; }
+      .live:not(.offline) .live-online { display: inline; }
+      .live.offline .live-offline { display: inline; }
+    }
+
+    @media (max-width: 420px) {
+      .stat-label { font-size: 10.5px; }
+      .stat-value { font-size: 18px; }
+      .stat-value.money { font-size: 15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 3v6a2 2 0 0 0 2 2 2 2 0 0 0 2-2V3" />
+          <path d="M6 11v10" />
+          <path d="M17 3c-1.66 0-3 1.79-3 4s1.34 4 3 4" />
+          <path d="M17 3v18" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-eyebrow">Panel de operaciones</span>
+        <h1 id="restName">El Gordo</h1>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="live" id="livePill" role="status" aria-live="polite">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="lastUpdate">Conectando…</span>
+        <span class="live-label live-online">En vivo</span>
+        <span class="live-label live-offline">Sin conexión</span>
+      </div>
+      <button type="button" class="icon-btn" id="refreshBtn" title="Actualizar ahora" aria-label="Actualizar ahora">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-3-6.7" />
+          <path d="M21 3v6h-6" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div id="banner" class="banner" role="alert"></div>
+
+    <section class="page-head">
+      <div>
+        <h2>Pedidos</h2>
+        <p>Gestiona en tiempo real los pedidos que llegan por Telegram.</p>
+      </div>
+      <div class="head-actions">
+        <div class="field">
+          <label for="exportDate">Fecha</label>
+          <input type="date" id="exportDate" />
+        </div>
+        <button type="button" class="btn-export" id="exportXlsx">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" />
+          </svg>
+          Excel
+        </button>
+        <button type="button" class="btn-export secondary" id="exportCsv">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" />
+          </svg>
+          CSV
+        </button>
+        <button type="button" class="btn-export ghost" id="clearDate">Ver todo</button>
+      </div>
+    </section>
+
+    <section class="stats" id="stats" aria-label="Resumen de pedidos">
+      <div class="stat"><div class="sk stat-icon"></div><div class="stat-body"><div class="sk sk-label"></div><div class="sk sk-value"></div></div></div>
+      <div class="stat"><div class="sk stat-icon"></div><div class="stat-body"><div class="sk sk-label"></div><div class="sk sk-value"></div></div></div>
+      <div class="stat"><div class="sk stat-icon"></div><div class="stat-body"><div class="sk sk-label"></div><div class="sk sk-value"></div></div></div>
+      <div class="stat"><div class="sk stat-icon"></div><div class="stat-body"><div class="sk sk-label"></div><div class="sk sk-value"></div></div></div>
+      <div class="stat"><div class="sk stat-icon"></div><div class="stat-body"><div class="sk sk-label"></div><div class="sk sk-value"></div></div></div>
+    </section>
+
+    <div class="toolbar">
+      <div class="filters" id="filters" role="group" aria-label="Filtrar por estado">
+        <button type="button" class="filter active" data-status="todos" aria-pressed="true">Todos <span class="count" data-count="todos">0</span></button>
+        <button type="button" class="filter" data-status="pendiente" aria-pressed="false">Pendientes <span class="count" data-count="pendiente">0</span></button>
+        <button type="button" class="filter" data-status="en_preparacion" aria-pressed="false">En preparación <span class="count" data-count="en_preparacion">0</span></button>
+        <button type="button" class="filter" data-status="entregado" aria-pressed="false">Entregados <span class="count" data-count="entregado">0</span></button>
+        <button type="button" class="filter" data-status="cancelado" aria-pressed="false">Cancelados <span class="count" data-count="cancelado">0</span></button>
+      </div>
+
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+        </svg>
+        <input type="search" id="searchInput" placeholder="Buscar pedido, cliente o teléfono" aria-label="Buscar pedidos" autocomplete="off" />
+      </div>
+    </div>
+
+    <section class="grid" id="orders">
+      <article class="order skeleton">
+        <div class="order-head"><div class="sk" style="width: 76px; height: 13px;"></div><div class="sk" style="width: 82px; height: 20px; border-radius: 999px;"></div></div>
+        <div class="customer"><div class="sk avatar"></div><div class="customer-info"><div class="sk sk-line"></div><div class="sk sk-line short"></div></div></div>
+        <div class="sk sk-items"></div>
+        <div class="sk sk-action"></div>
+      </article>
+      <article class="order skeleton">
+        <div class="order-head"><div class="sk" style="width: 76px; height: 13px;"></div><div class="sk" style="width: 82px; height: 20px; border-radius: 999px;"></div></div>
+        <div class="customer"><div class="sk avatar"></div><div class="customer-info"><div class="sk sk-line"></div><div class="sk sk-line short"></div></div></div>
+        <div class="sk sk-items"></div>
+        <div class="sk sk-action"></div>
+      </article>
+      <article class="order skeleton">
+        <div class="order-head"><div class="sk" style="width: 76px; height: 13px;"></div><div class="sk" style="width: 82px; height: 20px; border-radius: 999px;"></div></div>
+        <div class="customer"><div class="sk avatar"></div><div class="customer-info"><div class="sk sk-line"></div><div class="sk sk-line short"></div></div></div>
+        <div class="sk sk-items"></div>
+        <div class="sk sk-action"></div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <span><strong id="footerRest">El Gordo</strong> · Panel de pedidos</span>
+    <span>Actualización automática cada 5 segundos</span>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token") || "";
+    const authHeaders = token ? { "x-dashboard-token": token } : {};
+
+    let currentFilter = "todos";
+    let currentOrders = [];
+    let searchTerm = "";
+    let currency = "L.";
+    let configLoaded = false;
+    let loading = false;
+    let refreshQueued = false;
+    let queuedManual = false;
+    let statsKey = "";
+    let ordersKey = "";
+
+    const exportDate = document.getElementById("exportDate");
+    const searchInput = document.getElementById("searchInput");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const livePill = document.getElementById("livePill");
+    const lastUpdateEl = document.getElementById("lastUpdate");
+    const banner = document.getElementById("banner");
+
+    const STATUS_LABELS = {
+      pendiente: "Pendiente",
+      en_preparacion: "En preparación",
+      entregado: "Entregado",
+      cancelado: "Cancelado",
+    };
+
+    const svg = (paths, size = 16) =>
+      `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
+    const ICONS = {
+      receipt: svg('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6"/><path d="M9 12h6"/>'),
+      clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+      flame: svg('<path d="M12 3c2.5 3 4.5 5 4.5 8a4.5 4.5 0 0 1-9 0c0-1.5.8-2.8 2-4.2.4 1.1 1 1.8 1.7 2.2C11.8 7 12 5 12 3Z"/>'),
+      check: svg('<path d="M20 6 9 17l-5-5"/>'),
+      checkCircle: svg('<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>'),
+      cash: svg('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M7 10v.01M17 14v.01"/>'),
+      phone: svg('<path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 6 6L16.5 12l4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5a2 2 0 0 1 2-2Z"/>'),
+      truck: svg('<path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.5"/><circle cx="17.5" cy="18" r="1.5"/>'),
+      store: svg('<path d="M4 10v9h16v-9"/><path d="M3 10l2-6h14l2 6"/><path d="M3 10a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0"/>'),
+      pin: svg('<path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/>'),
+      alert: svg('<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.6 17.5A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.5L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'),
+      empty: svg('<path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"/><path d="M4 7.5 12 12l8-4.5"/><path d="M12 12v9"/>', 26),
+      cancel: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
+      trash: svg('<path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/>'),
+      lock: svg('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
+    };
+
+    const esc = (value) =>
+      String(value == null ? "" : value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[char]));
+
+    const money = (value) => {
+      const amount = Number(value || 0);
+      const formatted = new Intl.NumberFormat("es-ES", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(amount);
+      return `${currency} ${formatted}`;
+    };
+
+    function initials(name) {
+      const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return "?";
+      return (parts[0][0] + (parts[1] ? parts[1][0] : "")).toUpperCase();
+    }
+
+    function showBanner(message) {
+      banner.innerHTML = `${ICONS.alert}<span>${esc(message)}</span>`;
+      banner.style.display = "flex";
+    }
+
+    function hideBanner() {
+      banner.style.display = "none";
+      banner.innerHTML = "";
+    }
+
+    async function api(path, options = {}) {
+      const res = await fetch(path, {
+        ...options,
+        headers: { ...authHeaders, ...(options.headers || {}) },
+      });
+      if (res.status === 401) {
+        throw new Error("No autorizado. Agrega ?token=... a la URL del panel.");
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        if (res.status === 404 && !body.error) {
+          throw new Error(
+            "El servidor no reconoce esta acción: reinicia el bot (npm start) para cargar la versión actual del panel."
+          );
+        }
+        throw new Error(body.error || "No se pudo conectar con el servidor.");
+      }
+      return res.json();
+    }
+
+    async function loadConfig() {
+      if (configLoaded) return;
+      try {
+        const config = await api("/api/config");
+        currency = config.currency || currency;
+        const name = config.restaurantName || "El Gordo";
+        document.getElementById("restName").textContent = name;
+        document.getElementById("footerRest").textContent = name;
+        document.title = `Pedidos — ${name}`;
+        configLoaded = true;
+      } catch (error) {
+        // Si falla la configuración seguimos con los valores por defecto.
+      }
+    }
+
+    function renderStats(stats) {
+      const cards = [
+        { key: "total", label: "Pedidos totales", value: stats.total, tone: "neutral", icon: ICONS.receipt },
+        { key: "pendiente", label: "Pendientes", value: stats.pendiente, tone: "warning", icon: ICONS.clock },
+        { key: "en_preparacion", label: "En preparación", value: stats.en_preparacion, tone: "info", icon: ICONS.flame },
+        { key: "entregado", label: "Entregados", value: stats.entregado, tone: "success", icon: ICONS.checkCircle },
+        { key: "ventas", label: "Ventas", value: money(stats.ventas), tone: "brand", icon: ICONS.cash, money: true },
+      ];
+
+      document.getElementById("stats").innerHTML = cards
+        .map(
+          (card) => `
+            <article class="stat">
+              <span class="stat-icon tone-${card.tone}">${card.icon}</span>
+              <div class="stat-body">
+                <span class="stat-label">${card.label}</span>
+                <strong class="stat-value${card.money ? " money" : ""}">${card.value}</strong>
+              </div>
+            </article>`
+        )
+        .join("");
+
+      document.querySelectorAll("[data-count]").forEach((el) => {
+        const key = el.dataset.count;
+        const value = key === "todos" ? stats.total : stats[key];
+        el.textContent = Number(value || 0);
+      });
+    }
+
+    function actionButtons(order) {
+      if (order.status === "entregado" || order.status === "cancelado") {
+        const icon = order.status === "entregado" ? ICONS.checkCircle : ICONS.cancel;
+        const label = order.status === "entregado" ? "Pedido entregado" : "Pedido cancelado";
+        return `<div class="order-closed">${icon} ${label}</div>`;
+      }
+
+      const buttons = [];
+      if (order.status !== "en_preparacion") {
+        buttons.push(
+          `<button type="button" class="btn prep" data-num="${esc(order.number)}" data-status="en_preparacion">${ICONS.flame} En preparación</button>`
+        );
+      }
+      buttons.push(
+        `<button type="button" class="btn done" data-num="${esc(order.number)}" data-status="entregado">${ICONS.check} Entregado</button>`
+      );
+      buttons.push(
+        `<button type="button" class="btn cancel" data-num="${esc(order.number)}" data-status="cancelado">${ICONS.cancel} Cancelar</button>`
+      );
+      return `<div class="actions">${buttons.join("")}</div>`;
+    }
+
+    function orderCard(order) {
+      const items = (order.items || [])
+        .map(
+          (item) => `
+            <div class="item">
+              <span class="qty">${esc(item.qty)}×</span>
+              <span class="item-name">${esc(item.name)}</span>
+              <span class="item-price">${money(Number(item.price) * Number(item.qty))}</span>
+            </div>`
+        )
+        .join("");
+
+      const dateLabel = new Date(order.createdAt).toLocaleString("es-ES", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+
+      let address = "";
+      if (order.type === "delivery" && order.address) {
+        address = /^https?:\/\//.test(order.address)
+          ? `<a class="meta-link" href="${esc(order.address)}" target="_blank" rel="noopener">${ICONS.pin} Ver ubicación</a>`
+          : `<span class="meta-item">${ICONS.pin} ${esc(order.address)}</span>`;
+      }
+
+      const typeLabel = order.type === "delivery"
+        ? `${ICONS.truck}<span>Delivery</span>`
+        : `${ICONS.store}<span>Retiro</span>`;
+
+      const delivery = Number(order.delivery) || 0;
+
+      return `
+        <article class="order status-${esc(order.status)}">
+          <div class="order-head">
+            <div class="order-id">Pedido <span>#${esc(order.number)}</span></div>
+            <div class="order-head-right">
+              <span class="badge badge-${esc(order.status)}"><i></i>${STATUS_LABELS[order.status] || esc(order.status)}</span>
+              <button type="button" class="icon-btn danger order-delete" data-num="${esc(order.number)}" title="Eliminar pedido" aria-label="Eliminar pedido #${esc(order.number)}">${ICONS.trash}</button>
+            </div>
+          </div>
+
+          <div class="customer">
+            <span class="avatar">${esc(initials(order.customerName))}</span>
+            <div class="customer-info">
+              <span class="customer-name">${esc(order.customerName)}</span>
+              <span class="customer-phone">${ICONS.phone} ${esc(order.phone)}</span>
+            </div>
+            <span class="type-chip">${typeLabel}</span>
+          </div>
+
+          <div class="order-meta">
+            <span class="meta-item">${ICONS.clock} ${esc(dateLabel)}</span>
+            ${address}
+          </div>
+
+          <div class="items">${items}</div>
+
+          <div class="breakdown">
+            <div><span>Subtotal</span><span>${money(order.subtotal)}</span></div>
+            ${delivery ? `<div><span>Envío</span><span>${money(delivery)}</span></div>` : ""}
+          </div>
+
+          <div class="total-row">
+            <span>Total</span>
+            <strong>${money(order.total)}</strong>
+          </div>
+
+          ${actionButtons(order)}
+        </article>`;
+    }
+
+    function renderOrders(orders) {
+      const container = document.getElementById("orders");
+      const term = searchTerm.trim().toLowerCase();
+
+      const visible = term
+        ? orders.filter((order) => {
+            const haystack = [
+              order.number,
+              order.customerName,
+              order.phone,
+              order.address,
+              ...(order.items || []).map((item) => item.name),
+            ]
+              .join(" ")
+              .toLowerCase();
+            return haystack.includes(term);
+          })
+        : orders;
+
+      if (!visible.length) {
+        const hasFilters = term || currentFilter !== "todos" || exportDate.value;
+        container.innerHTML = `
+          <div class="empty">
+            <span class="empty-icon">${ICONS.empty}</span>
+            <h3>${hasFilters ? "Sin resultados" : "Aún no hay pedidos"}</h3>
+            <p>${
+              hasFilters
+                ? "Prueba con otro término de búsqueda o cambia los filtros."
+                : "Los pedidos que lleguen por Telegram aparecerán aquí automáticamente."
+            }</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = visible.map(orderCard).join("");
+    }
+
+    function buildQuery({ status = false } = {}) {
+      const query = new URLSearchParams();
+      if (status && currentFilter !== "todos") query.set("status", currentFilter);
+      if (exportDate.value) query.set("date", exportDate.value);
+      const value = query.toString();
+      return value ? `?${value}` : "";
+    }
+
+    async function refresh({ manual = false } = {}) {
+      if (loading) {
+        refreshQueued = true;
+        queuedManual = queuedManual || manual;
+        return;
+      }
+      loading = true;
+      if (manual) {
+        refreshBtn.classList.add("spinning");
+        refreshBtn.disabled = true;
+      }
+
+      try {
+        await loadConfig();
+        const [stats, orders] = await Promise.all([
+          api("/api/stats" + buildQuery()),
+          api("/api/orders" + buildQuery({ status: true })),
+        ]);
+
+        currentOrders = orders;
+        hideBanner();
+
+        const nextStatsKey = JSON.stringify(stats);
+        if (nextStatsKey !== statsKey) {
+          renderStats(stats);
+          statsKey = nextStatsKey;
+        }
+
+        const nextOrdersKey = JSON.stringify(orders) + "|" + currentFilter + "|" + exportDate.value;
+        if (nextOrdersKey !== ordersKey) {
+          renderOrders(orders);
+          ordersKey = nextOrdersKey;
+        }
+
+        livePill.classList.remove("offline");
+        lastUpdateEl.textContent =
+          "Actualizado " +
+          new Date().toLocaleTimeString("es-ES", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+      } catch (error) {
+        showBanner(error.message);
+        livePill.classList.add("offline");
+        lastUpdateEl.textContent = "Sin conexión";
+      } finally {
+        loading = false;
+        refreshBtn.classList.remove("spinning");
+        refreshBtn.disabled = false;
+
+        if (refreshQueued) {
+          const nextManual = queuedManual;
+          refreshQueued = false;
+          queuedManual = false;
+          refresh({ manual: nextManual });
+        }
+      }
+    }
+
+    function exportUrl(kind) {
+      const query = new URLSearchParams();
+      if (token) query.set("token", token);
+      if (currentFilter !== "todos") query.set("status", currentFilter);
+      if (exportDate.value) query.set("date", exportDate.value);
+      return `/api/export/${kind}?${query.toString()}`;
+    }
+
+    document.getElementById("exportXlsx").addEventListener("click", () => {
+      window.location.href = exportUrl("xlsx");
+    });
+
+    document.getElementById("exportCsv").addEventListener("click", () => {
+      window.location.href = exportUrl("csv");
+    });
+
+    document.getElementById("clearDate").addEventListener("click", () => {
+      exportDate.value = "";
+      refresh();
+    });
+
+    exportDate.addEventListener("change", refresh);
+    refreshBtn.addEventListener("click", () => refresh({ manual: true }));
+
+    searchInput.addEventListener("input", () => {
+      searchTerm = searchInput.value;
+      renderOrders(currentOrders);
+    });
+
+    document.getElementById("filters").addEventListener("click", (event) => {
+      const button = event.target.closest(".filter");
+      if (!button) return;
+
+      document.querySelectorAll(".filter").forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+
+      currentFilter = button.dataset.status;
+      refresh();
+    });
+
+    document.getElementById("orders").addEventListener("click", async (event) => {
+      const deleteBtn = event.target.closest(".order-delete");
+      if (deleteBtn) {
+        const num = deleteBtn.dataset.num;
+        const ok = window.confirm(
+          `¿Eliminar el pedido #${num}?\n\nEsta acción no se puede deshacer.`
+        );
+        if (!ok) return;
+        deleteBtn.disabled = true;
+        try {
+          await api(`/api/orders/${encodeURIComponent(num)}`, { method: "DELETE" });
+          await refresh();
+        } catch (error) {
+          showBanner(error.message);
+          deleteBtn.disabled = false;
+        }
+        return;
+      }
+
+      const button = event.target.closest(".btn");
+      if (!button) return;
+
+      const number = button.dataset.num;
+      const status = button.dataset.status;
+      button.disabled = true;
+
+      try {
+        await api(`/api/orders/${number}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        await refresh();
+      } catch (error) {
+        showBanner(error.message);
+        button.disabled = false;
+      }
+    });
+
+    refresh();
+    setInterval(refresh, 5000);
+  </script>
+</body>
+</html>
