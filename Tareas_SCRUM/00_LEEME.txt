@@ -1,0 +1,66 @@
+=====================================================================
+PROYECTO: Plataforma Integral de Ingenieria de Datos y Analitica Inteligente
+METODOLOGIA: SCRUM (adaptacion de 3 dias + buffer)
+FECHA INICIO: Miercoles 11 de noviembre de 2026
+FECHA LIMITE: Sabado 14 de noviembre de 2026
+=====================================================================
+
+{
+  "name": "ls",
+  "arguments": {
+    "dirPath": "C:/Users/julio/Desktop/Examen/data-platform"
+  }
+}
+
+CONTENIDO DE LA CARPETA
+---------------------------------------------------------------------
+  00_LEEME.txt            Este archivo (indice y como usar)
+  Product_Backlog.txt     Todas las historias de usuario priorizadas
+  Sprint_Plan.txt         Plan de sprints, roles, ceremonias y calendario
+  Tarea01.txt ... Tarea15.txt
+                          Tarjetas de tarea en formato SCRUM
+
+COMO USAR ESTOS ARCHIVOS
+---------------------------------------------------------------------
+1. El Product Owner (docente/equipo) prioriza el Product_Backlog.txt.
+2. En cada Sprint Planning se toman las tareas del sprint correspondiente.
+3. Cada integrante trabaja SOLO las tareas asignadas en su tarjeta.
+4. Al terminar una tarea se marcan los criterios de aceptacion [x].
+5. La tarea NO se cierra sin la EVIDENCIA listada en la tarjeta.
+6. Al final de cada sprint se hace Review (demo de 5 min) y Retro (5 min).
+
+ROLES DEL EQUIPO
+---------------------------------------------------------------------
+  Product Owner ......... Define alcance, KPIs y prioridad (docente/ lider)
+  Scrum Master .......... Coordina ceremonias, desbloquea, cuida el tiempo
+  Data Engineer ......... Tareas 01, 02, 04, 05, 06
+  DW / BI Developer ..... Tareas 03, 07, 08, 09, 10
+  ML Engineer ........... Tarea 11
+  GenAI / Automation .... Tareas 12, 13
+  QA / Documentacion .... Tareas 14, 15 (apoya a todos)
+
+DEFINICION DE TERMINADO (Definition of Done - GLOBAL)
+---------------------------------------------------------------------
+Una tarea esta DONE solo si:
+  [ ] Funciona y se puede ejecutar con los pasos del README.
+  [ ] Cumple todos sus criterios de aceptacion.
+  [ ] Genera la evidencia requerida (logs, consultas, capturas).
+  [ ] No contiene secretos, contrasenas ni datos sensibles.
+  [ ] Otro integrante puede reproducirla.
+  [ ] Esta subida al repositorio Git.
+
+REGLAS DE ORO DEL PROYECTO
+---------------------------------------------------------------------
+  - Un solo proceso de negocio: VENTAS. No ampliar alcance.
+  - El frontend NUNCA se conecta directo a SQL Server.
+  - Los KPIs descriptivos salen del Data Warehouse.
+  - Ningun modelo se evalua con datos de entrenamiento.
+  - La IA no inventa cifras: consulta vistas/consultas aprobadas.
+  - Un batch nocturno NO es tiempo real: no prometer tiempo real.
+
+ARBOL DE ARCHIVOS ESPERADO (repositorio)
+---------------------------------------------------------------------
+  data-platform/
+    documentation/   database/   etl/   frontend/   backend/
+    machine-learning/   generative-ai/   notifications/
+    tests/   deployment/   .env.example   README.md

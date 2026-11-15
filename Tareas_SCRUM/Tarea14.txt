@@ -1,0 +1,48 @@
+=====================================================================
+TAREA 14 - Documentacion, README y plan de pruebas
+=====================================================================
+Epica: 8. Pruebas, documentacion y demo       Rubrica: 10%
+Sprint: S3 (Sabado 14 - cierre)               Prioridad: 1 (Alta)
+Story Points: 5                               Responsable: QA / Documentacion
+Depende de: T01..T13                           Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como evaluador o nuevo integrante,
+quiero documentacion y pruebas claras,
+para ejecutar, verificar y mantener la solucion sin ayuda.
+
+DESCRIPCION
+---------------------------------------------------------------------
+Documentacion obligatoria:
+1. Requerimientos funcionales y no funcionales.
+2. Arquitectura de solucion y diagrama general.
+3. ERD de fuente y diccionario de datos.
+4. Diagrama dimensional y diccionario del DW.
+5. Diagramas de extraccion, transformacion, carga y orquestacion.
+6. Catalogo de reglas de calidad y transformacion.
+7. Documentacion de APIs y contratos de datos.
+8. Documento ML y documento GenAI.
+9. Documento de alertas y automatizacion.
+10. Plan y resultados de pruebas.
+11. Manual de instalacion, despliegue, operacion y usuario.
+
+Pruebas a documentar (tabla de la rubrica):
+Carga inicial, incremental, idempotencia, nulos/duplicados,
+integridad, recuperacion, reconciliacion, dashboard, ML,
+GenAI, alertas y end-to-end.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] README permite ejecutar la solucion paso a paso.
+[ ] Repositorio libre de secretos (revisar historial).
+[ ] .env.example presente y sin credenciales reales.
+[ ] Plan de pruebas con evidencia por cada prueba de la rubrica.
+[ ] Manual de recuperacion: reiniciar pipeline y restaurar ambiente.
+[ ] Documentacion en /documentation.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- README.md completo.
+- documentation/ con todos los documentos.
+- tests/ con resultados de ejecucion.

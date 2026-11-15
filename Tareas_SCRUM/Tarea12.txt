@@ -1,0 +1,41 @@
+=====================================================================
+TAREA 12 - Asistente GenAI con consultas controladas + 10 pruebas
+=====================================================================
+Epica: 6. Generative AI                        Rubrica: 10%
+Sprint: S2 (Viernes 13)                        Prioridad: 1 (Alta)
+Story Points: 5                                Responsable: GenAI/Automation
+Depende de: T08, T09                            Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como usuario de negocio,
+quiero preguntar en lenguaje natural sobre los datos,
+para obtener respuestas respaldadas por el Data Warehouse.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Arquitectura segura:
+   usuario -> chat web -> backend -> validacion -> consultas aprobadas
+   -> resultados del DW -> modelo generativo -> respuesta con fuentes.
+2. El modelo NO ejecuta SQL arbitrario ni tiene acceso irrestricto.
+3. Usar consultas parametrizadas, vistas aprobadas o herramientas limitadas.
+4. Mostrar fecha de actualizacion de los datos.
+5. Distinguir hechos, predicciones e interpretaciones generadas.
+6. Responder "no hay datos suficientes" cuando no exista respaldo.
+7. Validar entradas y limitar tamano/frecuencia de solicitudes.
+8. Registrar consultas de forma compatible con privacidad.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] El asistente responde usando datos verificables del DW.
+[ ] No ejecuta SQL libre con privilegios elevados.
+[ ] Respuestas incluyen metricas o periodos que las sustentan.
+[ ] Reconoce cuando no hay informacion suficiente (minimo 2 casos).
+[ ] No envia datos personales/sensibles a servicios externos sin autorizacion.
+[ ] 10 preguntas de prueba documentadas con resultado esperado y obtenido.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Codigo en /generative-ai.
+- Documento GenAI: arquitectura, controles, pruebas y limites.
+- Tabla de 10 pruebas: pregunta, resultado esperado, respaldo, respuesta.

@@ -1,0 +1,45 @@
+=====================================================================
+TAREA 11 - Modelo ML con baseline, evaluacion y endpoint
+=====================================================================
+Epica: 5. Machine Learning                     Rubrica: 10%
+Sprint: S2 (Viernes 13)                        Prioridad: 1 (Alta)
+Story Points: 5                                Responsable: ML Engineer
+Depende de: T08                                 Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como analista de negocio,
+quiero un modelo predictivo confiable y versionado,
+para anticipar demanda o riesgo y tomar mejores decisiones.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Definir problema, usuario y decision que apoya el modelo.
+2. Elegir formulacion: regresion/serie (ventas) o clasificacion (abandono).
+3. Extraer datos del DW o vista analitica controlada.
+4. Analizar distribucion, faltantes y sesgos.
+5. Feature engineering reproducible.
+6. Separar train/validacion/test respetando el tiempo.
+7. Crear baseline simple.
+8. Entrenar y evaluar sin usar el test para decidir.
+9. Guardar modelo, parametros, fecha, version y metricas.
+10. Exponer predicciones por API o proceso programado.
+11. Guardar resultados con version, fecha y horizonte.
+12. Mostrar predicciones y metricas en el dashboard.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Variable objetivo y decision definidas.
+[ ] Baseline implementado y comparado con el modelo.
+[ ] Sin data leakage (features disponibles al momento de predecir).
+[ ] Division temporal correcta (no aleatoria en series).
+[ ] Metricas apropiadas (MAE/RMSE o F1/ROC-AUC).
+[ ] Modelo versionado y guardado con sus parametros.
+[ ] Prediccion accesible por API/endpoint o proceso.
+[ ] Limitaciones y sesgos documentados.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Notebook y modulos de entrenamiento en /machine-learning.
+- Tabla de experimentos y metricas.
+- Documento ML: problema, variables, experimentos, metricas y limites.

@@ -1,0 +1,44 @@
+=====================================================================
+TAREA 06 - Reglas de calidad y transformaciones obligatorias
+=====================================================================
+Epica: 2. ETL, staging y calidad               Rubrica: 20%
+Sprint: S1 (Jueves 12)                        Prioridad: 1 (Alta)
+Story Points: 5                               Responsable: Data Engineer
+Depende de: T04                               Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como responsable de calidad de datos,
+quiero reglas documentadas y probadas,
+para asegurar que el DW reciba datos correctos y trazables.
+
+DESCRIPCION
+---------------------------------------------------------------------
+Implementar y documentar las transformaciones obligatorias:
+1. Data profiling: nulos, distintos, minimos, maximos, formatos.
+2. Limpieza: espacios, caracteres invalidos, formatos.
+3. Nulos: clasificar (no aplica, desconocido, pendiente, error, medida).
+4. Duplicados: clave de duplicidad + regla de supervivencia.
+5. Estandarizacion: fechas, textos, codigos, unidades, monedas, zona horaria.
+6. Tipos de datos: conversion explicita sin truncar ni perder precision.
+7. Integridad referencial: huerfanos -> corregir, cuarentena o miembro desconocido.
+8. Outliers: detectar por regla; investigar antes de eliminar.
+9. Reglas de negocio: rangos, estados, fechas, cantidades, coherencia.
+10. Enriquecimiento: atributos derivados reproducibles.
+11. Integracion: controlar joins uno-a-muchos para no multiplicar medidas.
+12. Linaje: registrar fuente, transformacion y destino.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Catalogo de reglas de calidad documentado (nombre, regla, accion).
+[ ] Cada regla genera registros en cuarentena cuando falla.
+[ ] No se reemplazan todos los nulos por cero sin justificacion.
+[ ] No se eliminan duplicados sin regla de supervivencia.
+[ ] Reporte de calidad antes/despues (completitud, unicidad, validez).
+[ ] Linaje documentado para los campos clave.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- documentation/calidad_datos.md con el catalogo de reglas.
+- Reporte de calidad antes y despues.
+- Consultas mostrando cuarentena por regla.

@@ -1,0 +1,44 @@
+=====================================================================
+TAREA 13 - Alerta end-to-end, reglas y monitoreo
+=====================================================================
+Epica: 7. Automatizacion y notificaciones      Rubrica: 5%
+Sprint: S2 (Viernes 13)                        Prioridad: 2 (Media)
+Story Points: 3                                Responsable: GenAI/Automation
+Depende de: T10, T11                            Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como responsable de operaciones,
+quiero recibir alertas automaticas ante condiciones relevantes,
+para actuar a tiempo y dejar registro de lo ocurrido.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Implementar al menos un disparador:
+   - Regla de negocio (ej: ventas caen mas de 15%).
+   - Prediccion ML bajo umbral.
+   - Anomalia resumida por GenAI.
+2. Canal: dashboard, correo SMTP o WebSocket (uno basta).
+3. Contenido minimo de alerta: id, fecha/hora, tipo, severidad,
+   indicador/entidad, valor observado, umbral, periodo, origen,
+   explicacion/accion y estado.
+4. Evitar notificaciones duplicadas.
+5. Registrar generacion y entrega.
+6. Crear vista de monitoreo: ultima carga, rechazados, fallas,
+   version del modelo y estado de notificaciones.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Se prueba el disparo (condicion verdadera).
+[ ] Se prueba el no disparo (condicion falsa).
+[ ] No se duplican alertas para el mismo evento.
+[ ] Se registra generacion y entrega de la alerta.
+[ ] Se puede consultar detalle y estado de la alerta.
+[ ] Vista/reporte de monitoreo operativo disponible.
+[ ] Eventos simulados se identifican como simulacion.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Codigo en /notifications.
+- Registro/log de alerta generada y entregada.
+- Captura de la vista de monitoreo.

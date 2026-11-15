@@ -1,0 +1,70 @@
+=====================================================================
+SPRINT PLAN - SCRUM ADAPTADO A 3 DIAS + BUFFER
+Proyecto: Plataforma Integral de Ingenieria de Datos y Analitica Inteligente
+=====================================================================
+Hoy: Miercoles 11 nov 2026 | Limite: Sabado 14 nov 2026
+Objetivo: terminar CODIGO el viernes en la noche; sabado = ensayo y colchon.
+
+CALENDARIO
+---------------------------------------------------------------------
+SPRINT 0 - "Fundaciones" (Miercoles 11, noche, 2-3 h)
+  Meta: repo listo, fuente arriba, alcance y ERD definidos.
+  Tareas: T01, T02, T03
+  Review: repo + ERD + documento de decisiones + KPIs definidos.
+
+SPRINT 1 - "Datos confiables" (Jueves 12, dia completo)
+  Meta: ETL completo con staging, calidad y DW cargado y reconciliado.
+  Tareas: T04, T05, T06, T07, T08
+  Review: pipeline ejecutado + conteos + reconciliacion + consulta al DW.
+
+SPRINT 2 - "Analitica inteligente" (Viernes 13, dia completo)
+  Meta: dashboard, ML, GenAI y alertas funcionando sobre el DW.
+  Tareas: T09, T10, T11, T12, T13
+  Review: demo end-to-end (fuente -> dashboard -> ML -> GenAI -> alerta).
+
+SPRINT 3 - "Cierre y demo" (Sabado 14, manana)
+  Meta: documentacion final, pruebas y ensayo de presentacion.
+  Tareas: T14, T15
+  Review: video grabado + ensayo en vivo + ambiente limpio y recuperable.
+
+CEREMONIAS
+---------------------------------------------------------------------
+  Sprint Planning .... 15 min al inicio de cada sprint
+  Daily Scrum ........ 10 min cada manana (que hice / que hare / bloqueos)
+  Sprint Review ...... 10 min al final de cada sprint (demo + evidencia)
+  Retrospectiva ...... 5 min (que funciono / que mejorar)
+
+CAPACIDAD Y REGLA DE TIEMPO
+---------------------------------------------------------------------
+  Si una tarea se atrasa mas de 2 horas, avisar al Scrum Master.
+  Si el viernes a las 18:00 algo no funciona: RECORTAR (ver abajo).
+  No iniciar tareas nuevas despues del viernes 20:00. Solo cerrar y grabar.
+
+ORDEN DE RECORTE SI FALTA TIEMPO (de menor impacto a mayor)
+---------------------------------------------------------------------
+  1. Streamlit en vez de React (solo si el backend ya funciona).
+  2. Un solo modelo ML clasico, sin tuning.
+  3. SCD Tipo 1 en vez de Tipo 2.
+  4. Alertas solo en el dashboard (sin SMTP).
+  5. GenAI solo con Ollama local y una herramienta de consulta.
+
+NUNCA RECORTAR (lo mas penalizado por la rubrica)
+---------------------------------------------------------------------
+  - Staging con trazabilidad (raw separado de preparado).
+  - Modelo dimensional con grano declarado.
+  - KPIs validados con consulta SQL independiente.
+  - Baseline del modelo ML y evaluacion en datos no usados.
+  - README reproducible y repo sin secretos.
+
+RIESGOS DEL SPRINT
+---------------------------------------------------------------------
+  Dependencia no instalada -> resolver en Sprint 0, no el viernes.
+  Data leakage en ML -> dividir por fecha, nunca aleatorio en series.
+  Frontend conectado directo a SQL -> prohibido, usar la API.
+  Cifras inventadas por la IA -> solo vistas/consultas parametrizadas.
+  Secretos en el repo -> usar .env y .env.example.
+
+TABLERO SCRUM SUGERIDO (columnas)
+---------------------------------------------------------------------
+  BACKLOG | POR HACER | EN CURSO (max 1 por persona) | EN REVISION | HECHO
+Se puede usar GitHub Projects, Trello o una hoja de calculo.

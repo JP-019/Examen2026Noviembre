@@ -1,0 +1,37 @@
+=====================================================================
+TAREA 05 - Extraccion inicial e incremental con idempotencia
+=====================================================================
+Epica: 2. ETL, staging y calidad               Rubrica: 20%
+Sprint: S1 (Jueves 12)                        Prioridad: 1 (Alta)
+Story Points: 8                               Responsable: Data Engineer
+Depende de: T04                               Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como ingeniero de datos,
+quiero una carga inicial y una incremental confiable,
+para mantener el staging actualizado sin duplicar datos.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Carga inicial completa del conjunto acordado.
+2. Carga incremental con UpdatedAt, watermark o CDC.
+3. Persistir el watermark y actualizarlo SOLO si la carga termina bien.
+4. Definir ventana de solapamiento si hay retrasos en la fuente.
+5. Deteccion de eliminaciones (si aplica) y registros tardios.
+6. Upsert controlado para evitar duplicados.
+7. Reejecucion idempotente: no duplicar ni alterar resultados.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Carga inicial ejecutada con conteos registrados.
+[ ] Carga incremental detecta cambios sin duplicar registros.
+[ ] Reejecutar el mismo lote no duplica filas (idempotencia).
+[ ] Watermark persistido y actualizado solo en exito.
+[ ] Se registran conteos leidos, transformados, cargados y rechazados.
+[ ] Estrategia de eliminaciones y registros tardios documentada.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Log con execution_id y conteos de cada carga.
+- Prueba de reejecucion mostrando que los conteos no cambian.

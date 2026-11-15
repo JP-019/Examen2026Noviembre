@@ -1,0 +1,37 @@
+=====================================================================
+TAREA 09 - API backend (FastAPI) con endpoints de KPIs
+=====================================================================
+Epica: 4. Business Intelligence y dashboard    Rubrica: 15%
+Sprint: S2 (Viernes 13)                        Prioridad: 1 (Alta)
+Story Points: 5                                Responsable: DW/BI Developer
+Depende de: T08                                 Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como desarrollador del dashboard,
+quiero una API que consulte el Data Warehouse,
+para que el frontend obtenga datos sin conectarse directo a SQL Server.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Backend en FastAPI (o .NET/Node) con conexion al DW.
+2. Endpoints: KPIs, tendencias, filtros por fecha y dimensiones, detalle.
+3. Consultas parametrizadas (prevenir inyeccion SQL).
+4. Validacion de entrada y limites de paginacion.
+5. Documentacion automatica de la API (/docs).
+6. Manejo de estados: sin datos, error y carga.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] El frontend NO se conecta directo a SQL Server.
+[ ] Endpoints documentados y probados (Swagger/OpenAPI).
+[ ] Consultas parametrizadas y con paginacion.
+[ ] Respuesta incluye fecha de ultima actualizacion de datos.
+[ ] Manejo de errores y de periodos sin datos.
+[ ] Credenciales tomadas de variables de entorno.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Codigo backend en /backend.
+- Captura de /docs y prueba de al menos 3 endpoints.
+- .env.example con variables necesarias (sin secretos).

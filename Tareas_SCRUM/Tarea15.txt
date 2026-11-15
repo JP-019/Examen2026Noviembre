@@ -1,0 +1,55 @@
+=====================================================================
+TAREA 15 - Video de 5 min y ensayo de demo en vivo
+=====================================================================
+Epica: 8. Pruebas, documentacion y demo       Rubrica: 5%
+Sprint: S3 (Sabado 14 - cierre)               Prioridad: 1 (Alta)
+Story Points: 3                               Responsable: Todo el equipo
+Depende de: T14                                Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como equipo,
+quiero grabar un video y ensayar la demo,
+para demostrar el sistema funcionando de punta a punta.
+
+DESCRIPCION - GUION DEL VIDEO (5 minutos)
+---------------------------------------------------------------------
+0:00-0:40  Caso, arquitectura y tecnologias.
+0:40-1:30  ETL: extraccion, staging, transformacion y controles.
+1:30-2:15  Modelo dimensional, carga y consulta de validacion.
+2:15-3:00  Dashboard: KPIs, filtros y analisis historico.
+3:00-3:45  Modelo predictivo y explicacion de una metrica.
+3:45-4:25  Consulta al asistente generativo con respuesta respaldada.
+4:25-5:00  Disparo y visualizacion de una alerta.
+
+CONDICIONES DEL VIDEO
+---------------------------------------------------------------------
+[ ] Duracion objetivo: 5 minutos.
+[ ] Audio claro y captura de pantalla legible.
+[ ] Mostrar ejecucion real, no solo diapositivas.
+[ ] No mostrar contrasenas, tokens ni datos sensibles.
+[ ] Identificar eventos simulados.
+[ ] Conclusion breve y que esta funcionando.
+
+CONDICIONES DE LA DEMO EN VIVO
+---------------------------------------------------------------------
+[ ] Ambiente preparado y procedimiento de inicio conocido.
+[ ] Ejecutar al menos un pipeline o lote de prueba.
+[ ] Mostrar dashboard y una consulta analitica.
+[ ] Ejecutar una prediccion con version identificable.
+[ ] Realizar una pregunta al componente generativo.
+[ ] Disparar una alerta de prueba y mostrar registro.
+[ ] Explicar como se recuperaria una ejecucion fallida.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Video grabado y revisado por el equipo.
+[ ] Ensayo completo de la demo sin errores criticos.
+[ ] Ambiente limpio y reproducible para el dia de la presentacion.
+[ ] Plan B listo (capturas/video) por si falla la red o la BD.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Archivo de video (5 min).
+- Guion de la demo.
+- Checklist de la demo marcado.

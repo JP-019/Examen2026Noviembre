@@ -1,0 +1,39 @@
+=====================================================================
+TAREA 03 - Arquitectura, alcance, stack y decisiones tecnicas
+=====================================================================
+Epica: 1. Descubrimiento y arquitectura       Rubrica: 10%
+Sprint: S0 (Miercoles 11)                     Prioridad: 1 (Alta)
+Story Points: 3                               Responsable: Scrum Master + DW/BI
+Depende de: T01, T02                          Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como equipo,
+quiero documentar la arquitectura y las decisiones tecnicas,
+para justificar cada tecnologia y mantener coherencia en la solucion.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Definir el alcance: un solo proceso (VENTAS). Lo que queda fuera.
+2. Diagrama de arquitectura por capas:
+   fuente -> extraccion -> staging -> DW -> BI/API -> ML/GenAI -> alertas.
+3. Documentar decisiones:
+   - Extraccion batch o incremental y por que.
+   - Staging separa raw de datos preparados.
+   - Herramienta de orquestacion y frecuencia.
+   - Manejo de fallas, reintentos y registros tardios.
+   - Frecuencia del dashboard y que significa "tiempo real" aqui.
+4. Definir stack final y versiones.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Diagrama de arquitectura general entregado.
+[ ] Documento de decisiones con justificacion por tecnologia.
+[ ] Alcance y no-alcance escritos y aprobados.
+[ ] Stack final definido (fuente, DW, ETL, backend, frontend, ML, GenAI).
+[ ] Frecuencia de actualizacion declarada.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- documentation/arquitectura.md con el diagrama.
+- Documento de decisiones tecnicas (ADR simple).

@@ -1,0 +1,66 @@
+=====================================================================
+PRODUCT BACKLOG
+Plataforma Integral de Ingenieria de Datos y Analitica Inteligente
+=====================================================================
+Prioridad: 1 = alta (bloqueante), 2 = media, 3 = baja (recortable)
+Puntos: escala Fibonacci (1,2,3,5,8,13)
+Estado: PENDIENTE / EN CURSO / HECHO
+---------------------------------------------------------------------
+
+EPICA 1 - Descubrimiento y arquitectura (rubrica 10%)
+---------------------------------------------------------------------
+ID    Tarea   Historia (resumen)                          Pri  Pts  Sprint
+T01   Entorno y fuente de datos reproducible               1    3    S0
+T02   Inventario, ERD, diccionario y preguntas analiticas  1    5    S0
+T03   Arquitectura, alcance, stack y decisiones            1    3    S0
+
+EPICA 2 - ETL, staging y calidad (rubrica 20%)
+---------------------------------------------------------------------
+T04   Staging 3 zonas + auditoria + cuarentena             1    5    S1
+T05   Extraccion inicial e incremental con idempotencia    1    8    S1
+T06   Reglas de calidad y transformaciones obligatorias    1    5    S1
+
+EPICA 3 - Modelo dimensional y Data Warehouse (rubrica 15%)
+---------------------------------------------------------------------
+T07   Modelo dimensional: hechos, dimensiones, SCD        1    8    S1
+T08   Carga al DW y reconciliacion entre capas             1    5    S1
+
+EPICA 4 - Business Intelligence y dashboard (rubrica 15%)
+---------------------------------------------------------------------
+T09   API backend (FastAPI) con endpoints de KPIs          1    5    S2
+T10   Dashboard web: KPIs, filtros, detalle y tendencias   1    8    S2
+
+EPICA 5 - Machine Learning (rubrica 10%)
+---------------------------------------------------------------------
+T11   Modelo ML con baseline, evaluacion y endpoint        1    5    S2
+
+EPICA 6 - Generative AI (rubrica 10%)
+---------------------------------------------------------------------
+T12   Asistente GenAI con consultas controladas + 10 tests 1    5    S2
+
+EPICA 7 - Automatizacion y notificaciones (rubrica 5%)
+---------------------------------------------------------------------
+T13   Alerta end-to-end, reglas y monitoreo                 2    3    S2
+
+EPICA 8 - Pruebas, documentacion y demo (rubrica 10% + 5%)
+---------------------------------------------------------------------
+T14   Documentacion, README y plan de pruebas              1    5    S3
+T15   Video de 5 min y ensayo de demo en vivo              1    3    S3
+
+RESUMEN
+---------------------------------------------------------------------
+  Total tareas ......... 15
+  Total story points ... 76
+  Sprints .............. 4 (S0 fundaciones, S1 datos, S2 analitica, S3 cierre)
+
+MAPEO A LA RUBRICA
+---------------------------------------------------------------------
+  Analisis y arquitectura ........ T01, T02, T03
+  ETL, staging y calidad ......... T04, T05, T06
+  Modelo dimensional ............. T07, T08
+  Dashboard y API ................ T09, T10
+  Machine Learning ............... T11
+  Generative AI .................. T12
+  Automatizacion ................. T13
+  Pruebas y documentacion ........ T14
+  Demo y comunicacion ............ T15

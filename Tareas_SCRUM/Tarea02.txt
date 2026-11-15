@@ -1,0 +1,36 @@
+=====================================================================
+TAREA 02 - Inventario, ERD, diccionario y preguntas analiticas
+=====================================================================
+Epica: 1. Descubrimiento y arquitectura       Rubrica: 10%
+Sprint: S0 (Miercoles 11)                     Prioridad: 1 (Alta)
+Story Points: 5                               Responsable: Data Engineer
+Depende de: T01                               Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como analista de datos,
+quiero entender la estructura y calidad de la fuente,
+para disenar un ETL y un modelo dimensional correctos.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Inventario de tablas, columnas, tipos y volumenes.
+2. ERD de las tablas relevantes del proceso de VENTAS.
+3. Identificar PK, FK, claves naturales, fechas y auditoria.
+4. Diccionario de datos de la fuente.
+5. Perfilado: nulos, cardinalidad, minimos, maximos, formatos.
+6. Definir 4 a 6 KPIs y las preguntas analiticas a responder.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] ERD editable entregado (Draw.io / dbdiagram / similar).
+[ ] Diccionario con cada tabla y columna relevante.
+[ ] Perfil de columnas con porcentaje de nulos y valores frecuentes.
+[ ] PK, FK y posibles duplicados identificados.
+[ ] Lista de KPIs y preguntas analiticas aprobada por el Product Owner.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Diagrama ERD en documentation/.
+- Diccionario de datos (CSV o documento).
+- Resultado de consultas de perfilado.

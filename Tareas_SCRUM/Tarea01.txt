@@ -1,0 +1,38 @@
+=====================================================================
+TAREA 01 - Configurar entorno y fuente de datos reproducible
+=====================================================================
+Epica: 1. Descubrimiento y arquitectura       Rubrica: 10%
+Sprint: S0 (Miercoles 11)                     Prioridad: 1 (Alta)
+Story Points: 3                               Responsable: Data Engineer
+Depende de: ninguna                            Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como equipo de desarrollo,
+quiero un ambiente reproducible con la base de datos fuente cargada,
+para poder extraer datos y ejecutar el proyecto desde cualquier equipo.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Elegir dataset: WideWorldImporters (SQL Server) o Pagila (PostgreSQL).
+   Justificar la eleccion en el documento de decisiones.
+2. Crear el ambiente: Docker Compose o script de restauracion.
+3. Crear bases/esquemas separados: fuente, staging y data warehouse.
+4. Crear usuarios tecnicos con permisos minimos (no usar admin).
+5. Versionar scripts SQL y configuracion.
+6. Documentar versiones de motores y librerias.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] La base fuente se levanta con UN comando documentado.
+[ ] Existen esquemas separados para source, staging y dw.
+[ ] Usuario de aplicacion con permisos minimos (sin admin).
+[ ] Existe .env.example sin credenciales reales.
+[ ] README incluye: requisitos, puertos, volumenes y comandos.
+[ ] El ambiente se puede reiniciar desde cero siguiendo el README.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- docker-compose.yml (o script de restore) en el repositorio.
+- Captura o log de conexion exitosa a la base fuente.
+- README con pasos exactos de instalacion.

@@ -1,0 +1,38 @@
+=====================================================================
+TAREA 04 - Staging: 3 zonas + auditoria + cuarentena
+=====================================================================
+Epica: 2. ETL, staging y calidad               Rubrica: 20%
+Sprint: S1 (Jueves 12)                        Prioridad: 1 (Alta)
+Story Points: 5                               Responsable: Data Engineer
+Depende de: T01, T02                          Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como ingeniero de datos,
+quiero tres zonas de staging con trazabilidad,
+para conservar los datos originales y separar lo preparado.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Zona LANDING/RAW: copia fiel de lo recibido, sin sobrescribir.
+2. Zona CLEAN/VALIDATED: conversiones, limpieza y validaciones.
+3. Zona READY/INTEGRATION: datos integrados listos para el DW.
+4. Tabla de auditoria con: execution_id, pipeline_name,
+   start_time, end_time, source_object, target_object,
+   rows_read, inserted, updated, rejected, status,
+   error_detail, watermark_start, watermark_end.
+5. Tabla de cuarentena: registro, fuente, fecha, ejecucion,
+   regla fallida y detalle.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Existen las 3 zonas claramente separadas por esquema o tabla.
+[ ] La zona raw conserva el dato original sin modificaciones.
+[ ] Tabla de auditoria con todos los campos minimos.
+[ ] Tabla de cuarentena operativa y documentada.
+[ ] Cada registro preparado conserva claves de negocio y linaje.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Scripts SQL de creacion de esquemas/tablas.
+- Consulta de ejemplo mostrando auditoria y cuarentena pobladas.

@@ -1,0 +1,44 @@
+=====================================================================
+TAREA 10 - Dashboard web: KPIs, filtros, detalle y tendencias
+=====================================================================
+Epica: 4. Business Intelligence y dashboard    Rubrica: 15%
+Sprint: S2 (Viernes 13)                        Prioridad: 1 (Alta)
+Story Points: 8                                Responsable: DW/BI Developer
+Depende de: T09                                 Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como gerente de ventas,
+quiero un dashboard con KPIs e historicos,
+para analizar el desempeno y detectar tendencias.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Frontend: React (o Streamlit si falta tiempo).
+2. Graficos: Apache ECharts / Chart.js / Recharts.
+3. Panel principal con 4 a 6 KPIs.
+4. Filtros por fecha y al menos dos dimensiones.
+5. Tendencias historicas y comparacion entre periodos.
+6. Visualizaciones por categoria, producto, cliente o region.
+7. Tabla de detalle con paginacion.
+8. Drill-down desde resumen a detalle.
+9. Mostrar fecha/hora de ultima actualizacion.
+10. Estados de carga, error y ausencia de datos.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] 4 a 6 KPIs visibles y validados con SQL independiente.
+[ ] Filtros por fecha + 2 dimensiones funcionando.
+[ ] Tendencias y comparacion entre periodos.
+[ ] Tabla de detalle con paginacion.
+[ ] Drill-down o navegacion resumen -> detalle.
+[ ] Se muestra la fecha de ultima actualizacion.
+[ ] Estados de carga, error y sin datos manejados.
+[ ] Usable en escritorio y preferiblemente movil.
+[ ] Si muestra predicciones, se identifican como prediccion.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Capturas del dashboard con datos de prueba.
+- Documento de definicion de KPIs (nombre, formula, unidad, fuente).
+- Comparacion KPI vs consulta SQL independiente.

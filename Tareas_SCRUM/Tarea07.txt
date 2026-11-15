@@ -1,0 +1,41 @@
+=====================================================================
+TAREA 07 - Modelo dimensional: hechos, dimensiones, SCD y claves
+=====================================================================
+Epica: 3. Modelo dimensional y Data Warehouse   Rubrica: 15%
+Sprint: S1 (Jueves 12)                          Prioridad: 1 (Alta)
+Story Points: 8                                 Responsable: DW/BI Developer
+Depende de: T02, T04                            Estado: PENDIENTE
+
+HISTORIA DE USUARIO
+---------------------------------------------------------------------
+Como desarrollador de Data Warehouse,
+quiero un esquema estrella para ventas,
+para habilitar analisis historico y consultas de BI confiables.
+
+DESCRIPCION
+---------------------------------------------------------------------
+1. Proceso: VENTAS. Declarar el GRANO (ej: una linea de orden de venta).
+2. Dimensiones: DimDate, DimCustomer, DimProduct, DimEmployee, DimGeography.
+3. Hechos: FactSales con DateKey, CustomerKey, ProductKey, EmployeeKey,
+   GeographyKey, Quantity, UnitPrice, Discount, SalesAmount.
+4. Claves sustitutas por dimension + conservar claves naturales.
+5. Dimensión desconocida para hechos sin correspondencia.
+6. Estrategia SCD (Tipo 1 o Tipo 2) justificada.
+7. Scripts de creacion, indices y constraints.
+
+CRITERIOS DE ACEPTACION
+---------------------------------------------------------------------
+[ ] Grano declarado y documentado (que representa una fila).
+[ ] Star schema con hechos y dimensiones implementado en SQL Server.
+[ ] Claves sustitutas en cada dimension + clave natural conservada.
+[ ] DimDate con atributos de calendario (dia, mes, trimestre, anio).
+[ ] Politica de dimension desconocida definida y aplicada.
+[ ] Estrategia SCD documentada (Tipo 1 o 2).
+[ ] Medidas aditivas, semi-aditivas y no aditivas identificadas.
+
+EVIDENCIA REQUERIDA
+---------------------------------------------------------------------
+- Diagrama dimensional editable.
+- Documento de grano y definicion de medidas.
+- Diccionario de datos del DW.
+- Scripts SQL de creacion con indices y constraints.
